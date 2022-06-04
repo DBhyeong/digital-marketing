@@ -1,0 +1,22 @@
+iframes = driver.find_elements_by_tag_name('iframe')
+#print('현재 페이지에 iframe은 %d개가 있습니다.' % len(iframes))
+
+
+for i, iframe in enumerate(iframes):
+    try:
+        print('%d번째 iframe 입니다.' % i)
+        # i 번째 iframe으로 변경합니다.
+        driver.switch_to_frame(iframes[i])
+        # 변경한 iframe 안의 소스를 확인합니다.
+        print(driver.page_source)
+        # 원래 frame으로 돌아옵니다.
+        driver.switch_to_default_content()
+    except:
+        # exception이 발생했다면 원래 frame으로 돌아옵니다.
+        driver.switch_to_default_content()
+        # 몇 번째 frame에서 에러가 났었는지 확인합니다.
+        print('pass by except : iframes[%d]' % i)
+        # 다음 for문으로 넘어갑니다.
+ 
+driver.switch_to.frame(iframes[2]) #아이프레임
+#print(driver.page_source)
