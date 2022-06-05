@@ -1,0 +1,197 @@
+#쿠팡 파트너스 - 검색키워드 입력
+
+import hmac
+import hashlib
+import binascii
+import os
+import time
+import requests
+import json
+import urllib.request
+from selenium import webdriver
+import secrets
+from urllib.parse import urlencode
+from time import gmtime, strftime
+import pandas as pd
+
+keyword ='애플워치스트랩'  #키워드를 입력하세요!
+
+REQUEST_METHOD = "GET"
+DOMAIN = "https://api-gateway.coupang.com"
+URL = "/v2/providers/affiliate_open_api/apis/openapi/products/search?keyword="+urllib.parse.quote(keyword)+"&limit=10" 
+
+# Replace with your own ACCESS_KEY and SECRET_KEY
+ACCESS_KEY = ""  #access_key 를 입력하세요!
+SECRET_KEY = ""  #secret_key 를 입력하세요!
+
+def generateHmac(method, url, api_secret_key, api_access_key):
+    path, *query = url.split('?')
+    os.environ['TZ'] = 'GMT+0'
+    dt_datetime = strftime('%y%m%d', gmtime()) + 'T' + strftime('%H%M%S', gmtime()) + 'Z'  # GMT+0
+    msg = dt_datetime + method + path + (query[0] if query else '')
+    signature = hmac.new(bytes(api_secret_key, 'utf-8'), msg.encode('utf-8'), hashlib.sha256).hexdigest()
+ 
+    return 'CEA algorithm=HmacSHA256, access-key={}, signed-date={}, signature={}'.format(api_access_key, dt_datetime, signature)
+ 
+
+authorization = generateHmac(REQUEST_METHOD, URL, SECRET_KEY, ACCESS_KEY)
+url = "{}{}".format(DOMAIN, URL)
+resposne = requests.request(method=REQUEST_METHOD, url=url,
+                            headers={
+                                "Authorization": authorization,
+                                "Content-Type": "application/json"
+                            },
+                            data=json.dumps(REQUEST)
+                            )
+
+r_data = resposne.json() #json
+
+r_data['data']  #결과 보기
+
+#keyword_result_summary = pd.DataFrame(r_data['data']['productData'])  # 데이터 프레임
+#keyword_result_summary #보기
+
+
+#product_urls = r_data['data']['productData']
+
+#product_urls
+
+#keyword_result_summary
+
+
+
+#쿠팡 파트너스 기본 예제(숏츠 링크생성)
+
+import hmac
+import hashlib
+import binascii
+import os
+import time
+import requests
+import json
+import urllib.request
+from selenium import webdriver
+import secrets
+from urllib.parse import urlencode
+import hmac
+import hashlib
+import binascii
+import os
+import time
+import requests
+import json
+from time import gmtime, strftime
+
+REQUEST_METHOD = "POST"
+DOMAIN = "https://api-gateway.coupang.com"
+URL = "/v2/providers/affiliate_open_api/apis/openapi/v1/deeplink"
+
+# Replace with your own ACCESS_KEY and SECRET_KEY
+ACCESS_KEY = "" #키를 입력하세요!
+SECRET_KEY = "" #키를 입력하세요!
+
+
+REQUEST = { "coupangUrls": ['https://www.coupang.com/vp/products/5078753461',  #쿠팡 URL를 집어넣습니다. 
+'https://www.coupang.com/vp/products/2303973364'
+]
+}
+
+
+def generateHmac(method, url, api_secret_key, api_access_key):
+    path, *query = url.split('?')
+    os.environ['TZ'] = 'GMT+0'
+    dt_datetime = strftime('%y%m%d', gmtime()) + 'T' + strftime('%H%M%S', gmtime()) + 'Z'  # GMT+0
+    msg = dt_datetime + method + path + (query[0] if query else '')
+    signature = hmac.new(bytes(api_secret_key, 'utf-8'), msg.encode('utf-8'), hashlib.sha256).hexdigest()
+ 
+    return 'CEA algorithm=HmacSHA256, access-key={}, signed-date={}, signature={}'.format(api_access_key, dt_datetime, signature)
+ 
+
+authorization = generateHmac(REQUEST_METHOD, URL, SECRET_KEY, ACCESS_KEY)
+url = "{}{}".format(DOMAIN, URL)
+resposne = requests.request(method=REQUEST_METHOD, url=url,
+                            headers={
+                                "Authorization": authorization,
+                                "Content-Type": "application/json"
+                            },
+                            data=json.dumps(REQUEST)
+                            )
+
+print(resposne.json())
+
+
+#쿠팡 파트너스 - 카테고리별 베스트 상품에 대한 상세 상품 정보 생성
+
+import hmac
+import hashlib
+import binascii
+import os
+import time
+import requests
+import json
+import urllib.request
+from selenium import webdriver
+import secrets
+from urllib.parse import urlencode
+from time import gmtime, strftime
+import pandas as pd
+
+	
+#카테고리 코드
+#Id	이름
+#1001	여성패션
+#1002	남성패션
+#1010	뷰티
+#1011	출산/유아동
+#1012	식품
+#1013	주방용품
+#1014	생활용품
+#1015	홈인테리어
+#1016	가전디지털
+#1017	스포츠/레저
+#1018	자동차용품
+#1019	도서/음반/DVD
+#1020	완구/취미
+#1021	문구/오피스
+#1024	헬스/건강식품
+#1025	국내여행
+#1026	해외여행
+#1029	반려동물용품
+#1030	유아동패션
+
+categoryId = '1019' # 카테고리 ID를 입력해주세요.
+
+REQUEST_METHOD = "GET"
+DOMAIN = "https://api-gateway.coupang.com"
+URL = "/v2/providers/affiliate_open_api/apis/openapi/products/bestcategories/"+str(categoryId)+ "?limit=100"
+
+# Replace with your own ACCESS_KEY and SECRET_KEY
+ACCESS_KEY = "" #키를 입력하세요!
+SECRET_KEY = "" #키를 입력하세요!
+
+REQUEST = { "coupangUrls": ["https://www.coupang.com/np/search?component=&q=good&channel=user", "https://www.coupang.com/np/coupangglobal"]}
+
+def generateHmac(method, url, api_secret_key, api_access_key):
+    path, *query = url.split('?')
+    os.environ['TZ'] = 'GMT+0'
+    dt_datetime = strftime('%y%m%d', gmtime()) + 'T' + strftime('%H%M%S', gmtime()) + 'Z'  # GMT+0
+    msg = dt_datetime + method + path + (query[0] if query else '')
+    signature = hmac.new(bytes(api_secret_key, 'utf-8'), msg.encode('utf-8'), hashlib.sha256).hexdigest()
+ 
+    return 'CEA algorithm=HmacSHA256, access-key={}, signed-date={}, signature={}'.format(api_access_key, dt_datetime, signature)
+ 
+
+authorization = generateHmac(REQUEST_METHOD, URL, SECRET_KEY, ACCESS_KEY)
+url = "{}{}".format(DOMAIN, URL)
+resposne = requests.request(method=REQUEST_METHOD, url=url,
+                            headers={
+                                "Authorization": authorization,
+                                "Content-Type": "application/json"
+                            },
+                            data=json.dumps(REQUEST)
+                            )
+
+r_data = resposne.json() #json
+r_data['data']
+category_result_summary = pd.DataFrame(r_data['data'])  # 데이터 프레임
+category_result_summary #보기
