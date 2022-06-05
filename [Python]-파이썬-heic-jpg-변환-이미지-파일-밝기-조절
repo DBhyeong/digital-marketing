@@ -1,0 +1,91 @@
+import os, subprocess
+import glob
+from PIL import Image
+import numpy as np
+import cv2
+
+############################ heic 파일 jpg 변환 ######################################
+
+directory = 'C:/Users/user/raw/test/'  #디렉토리 설정
+
+for filename in os.listdir(directory) :
+    #print(filename)
+    if filename.lower().endswith(".heic") :
+        print('Converting ' + os.path.join(directory, filename))
+        subprocess.run(["C:/Program Files/ImageMagick-7.1.0-Q16-HDRI/magick.exe", os.path.join(directory, filename), os.path.join(directory, filename[0:-5] + '.jpg')])
+
+print("heic 파일 jpg 변환 전부 다 완료되었습니다.")
+
+#dir = 'C:/Program Files/ImageMagick-7.1.0-Q16-HDRI/magick.exe'
+
+############################ png 파일 jpg 변환 ######################################
+
+img_lists = glob.glob(str(directory)+'*.png') #jpg 파일만 가져오기
+
+img_files = []  #리스트
+
+for i in img_lists :
+    i = i.replace("\\", "/") #파일명 변경
+    img_files.append(i)   #리스트 담기
+
+dir_path  = directory  #폴더 디렉토리
+#img_lists = os.listdir(dir_path) #폴더 내 이미지 리스트에 담기
+
+n = 1
+
+for img_f in img_files :
+    #img_dir = str(dir_path) + str(img_f)
+    img_dir = str(img_f)
+    #print(img_dir)
+    img = Image.open(img_dir).convert('RGB')  #원파일
+    #img_resize = img.resize((360, 480)) #사이즈 조절  (360 x 480)
+    #img_resize.save(str(dir_path) +'test_result_'+str(n)+'.jpg') #결과파일
+    img.save(str(dir_path) +'photo_result_'+str(n)+'.jpg') #결과파일
+    n +=1
+
+print("png 파일 jpg 변환(완료)")
+#print(n)
+
+############################ 이미지 리사이징 or 파일조절 ############################
+
+img_lists = glob.glob(str(directory)+'*.jpg') #jpg 파일만 가져오기
+
+img_files = []  #리스트
+
+for i in img_lists :
+    i = i.replace("\\", "/") #파일명 변경
+    img_files.append(i)   #리스트 담기
+
+dir_path  = directory  #폴더 디렉토리
+#img_lists = os.listdir(dir_path) #폴더 내 이미지 리스트에 담기
+
+#n = 1
+
+#for img_f in img_files :
+    #img_dir = str(dir_path) + str(img_f)
+#    img_dir = str(img_f)
+    #print(img_dir)
+#    img = Image.open(img_dir) #원파일
+    #img_resize = img.resize((360, 480)) #사이즈 조절  (360 x 480)
+    #img_resize.save(str(dir_path) +'test_result_'+str(n)+'.jpg') #결과파일
+#    img.save(str(dir_path) +'test_result_'+str(n)+'.jpg') #결과파일
+#    n +=1
+
+print("이미지 리사이징 or 파일조절 완료")
+#print(n)
+
+######################## 밝기 조절(40) ########################
+
+n =1 
+
+for img_f in img_files :
+    src = cv2.imread(img_f, cv2.IMREAD_COLOR) #회색처리
+    val = 40 #(값)
+    array = np.full(src.shape, (val, val, val), dtype=np.uint8) #(백터화)
+    add = cv2.add(src, array) #이미지 밝기값 조절 넣기
+    cv2.imwrite('C:/Users/user/raw/test/submit_img_'+str(n)+'_color.jpg', add) #이미지 밝기값 파일 넣기
+    cv2.waitKey(0) 
+    cv2.destroyAllWindows()
+    n +=1
+
+print("이미지 밝기 조절 완료")
