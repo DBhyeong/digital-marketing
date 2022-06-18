@@ -1,0 +1,43 @@
+#플리커 인증
+
+import flickr_api
+
+flickr_api.set_keys(api_key = '', #인증 
+                    api_secret = '') #인증
+
+a =  flickr_api.auth.AuthHandler() 
+
+perms = "write"
+
+url = a.get_authorization_url(perms)
+print(url)
+
+#set_verifier 인증
+
+a.set_verifier('')
+flickr_api.set_auth_handler(a)
+
+#이미지, 동영상 등 업로드
+
+import time
+
+url = 'https://bit.ly/3NZcZP9'  #스마트스토어 URL (애플워치스트랩)
+
+for i in range(4, 423) :
+    photo_file= 'C:/Users/tera/Desktop/upload_2/submit_img_'+str(i)+'.jpg'
+    title = '[테라상사] 애플워치 스트랩 추천'
+    description = '테라상사 애플워치 투명스트랩입니다.' + '\n'
+    description += '주문할 때 내 마음대로 원하는 디자인과 스트랩,색상을 조합할 수 있으며, 꾸러기 같기도하고 스트랩에도 포인트를 줄 수 있어, 여름 스트랩 패션 고민을 해결해줍니다.' + '\n'
+    description += '귀여운 도안이 프린팅되며, 그날 그날 착장에 따라 다양하게 스트랩을 바꿔 낄 수 있으며, 무늬나 그림이 아기자기해서 정말 예쁜 포인트를 줄 수 있습니다.' + '\n' 
+    description += '다가오는 여름을 준비하며 상큼하고 귀여운 스트랩로 기분전환 제대로 되시길 바랍니다.' + '\n'     
+    description += '네이버에 테라상사 검색하시면 더 다양한 디자인을 찾아볼 수 있습니다. 밑에 구매하기 클릭!' + '\n'
+    description += str(url)
+    tags = '애플워치,	애플워치7,	애플워치se,	애플워치스트랩,	애플워치7스트랩,	애플워치se스트랩,	애플워치6,	애플워치3,	애플워치밴드,	애플워치투명스트랩,	애플워치5,	애플워치4,	애플워치6스트랩,	애플워치줄질,	애플워치se7,	애플워치줄,	애플스트랩,	애플워치44mm,	애플워치꾸미기,	애플워치3스트랩'   
+    try :
+        flickr_api.upload(photo_file=photo_file, title=title, description=description, tags=tags) #업로드
+        print(str(i)+'번째 사진이 업로드되었습니다.')
+    except :
+        print(str(i)+'번째 사진이 업로드되지 못했습니다.')
+    time.sleep(60) #1분간격
+    
+print("최종 이미지 업로드를 마쳤습니다.")
