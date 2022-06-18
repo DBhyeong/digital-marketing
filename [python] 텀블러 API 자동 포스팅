@@ -1,0 +1,81 @@
+# 이미지 디렉토리 경로
+
+import requests
+import json
+import os, subprocess
+import glob
+from PIL import Image
+import numpy as np
+import cv2
+
+img_file_lists = [] #이미지 내에 압축된 이미지 파일 리스트 담기
+
+directory = 'C:/Users/tera/Desktop/upload' #경로
+
+file_list = glob.glob(f"{directory}/submit_img_*.jpg")  #해당 파일만 리스트화
+
+for f in file_list :
+    f_2 = f.replace("\\", "/") #디렉토리 필터링
+    img_file_lists.append(f_2) #리스트 담기
+print("리스트업 완료")
+
+# 인증
+
+import pytumblr
+from requests_oauthlib import OAuth1Session
+
+key = '' #키입력
+secret =  '' #키입력
+ 
+request_token_url = 'http://www.tumblr.com/oauth/request_token'
+authorization_base_url = 'http://www.tumblr.com/oauth/authorize'
+access_token_url = 'http://www.tumblr.com/oauth/access_token'
+
+tumblr = OAuth1Session(key, client_secret=secret, callback_uri='http://www.tumblr.com/dashboard')
+tumblr.fetch_request_token(request_token_url)   #oauth_token 정보 및 oauth_token_secret 정보 파악
+
+authorization_url = tumblr.authorization_url(authorization_base_url)
+
+print(authorization_url) #하단 URL 클릭 이후 Allow 클릭
+
+import pytumblr
+
+#텀블러 인증
+
+consumer_key = '' #키입력
+consumer_secret =  '' #키입력
+
+oauth_token = ''  #oauth_token 입력
+oauth_token_secret = '' #oauth_token_secret 입력
+
+client = pytumblr.TumblrRestClient(consumer_key=consumer_key, consumer_secret=consumer_secret, oauth_token=oauth_token, oauth_secret=oauth_token_secret)
+
+#텀블러 포스팅
+
+import time
+#client.info() #정보
+
+content_txt = open('C:/Users/tera/Desktop/text/contents_tumblr.txt', 'r', encoding='utf8') #컨텐츠
+hash_txt = open('C:/Users/tera/Desktop/text/hash_keywords_tumblr.txt', 'r', encoding='utf8') #해시태그
+
+content_desc = content_txt.readlines() #컨텐츠 리드라인으로 긁어오자
+hash_desc = hash_txt.readlines() #해시 리드으로 긁어오자
+
+for i in range(14, 55) :
+    filepath = img_file_lists[i]
+    content = str(content_desc[i])
+    hash_tags = hash_desc[i]
+    hash_tags_2 = hash_tags.replace('#', "\"")  #해시태그 필터링
+    hash_tags_2 = hash_tags_2.replace('\t', "\", ") #해시태그 필터링
+    hash_tags_2 = hash_tags_2.replace('\n', '\"') #해시태그 필터링
+    blogName ='terakorea'
+    try :
+        client.create_photo(blogName, state = "published", 
+                    tags=[str(hash_tags_2)], #태그  (해시태그)
+                    data=filepath , #이미지 저장위치  (이미지업로드)
+                    caption=str(content) #캡션  (상품명)
+                    )
+        print(str(i) + "번쨰 포스팅 완료했습니다.")
+    except :
+        print(str(i) + "번째 포스팅을 완료하지 못했습니다.")
+    time.sleep(120) #2분 간격 조정
