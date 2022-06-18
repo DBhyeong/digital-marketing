@@ -1,0 +1,112 @@
+#이미지 파일 디렉토리 리스트업
+
+import requests
+import json
+import os, subprocess
+import glob
+from PIL import Image
+import numpy as np
+import cv2
+
+img_file_lists = [] #이미지 내에 압축된 이미지 파일 리스트 담기
+
+directory = 'C:/Users/tera/Desktop/upload' #경로
+
+file_list = glob.glob(f"{directory}/submit_img_*.jpg")  #해당 파일만 리스트화
+
+for f in file_list :
+    f_2 = f.replace("\\", "/") #디렉토리 필터링
+    img_file_lists.append(f_2) #리스트 담기
+print("이미지 리스트업 완료")
+
+
+
+#이미지 파일 디렉토리 리스트업
+
+import tweepy
+
+#인증정보
+
+api_key=''  #키입력
+api_secrets = '' #키입력
+access_token ='' #키입력
+access_secret = '' #키입력
+
+auth = tweepy.OAuthHandler(api_key,api_secrets)
+auth.set_access_token(access_token,access_secret)
+    
+api = tweepy.API(auth)    
+
+try:
+    api.verify_credentials()
+    print('Successful Authentication') #인증시 
+except:
+    print('Failed authentication') #실패시
+    
+# get user
+
+#user = api.get_user(screen_name='telasangsa') #아이디 입력시 정보 나옴  #예시 big203040
+#user._json #정보
+
+#status = "테스트입니다."
+#api.update_status(status=status)
+
+
+import requests
+import json
+import time
+import tweepy
+
+#포스팅
+
+api_key=''
+api_secrets = ''
+access_token =''
+access_secret = ''
+
+auth = tweepy.OAuthHandler(api_key,api_secrets)
+auth.set_access_token(access_token,access_secret)
+    
+api = tweepy.API(auth)    
+
+try:
+    api.verify_credentials()
+    print('Successful Authentication') #인증시 
+except:
+    print('Failed authentication') #실패시
+
+
+content_txt = open('C:/Users/tera/Desktop/text/contents_twitter.txt', 'r', encoding='utf8') #컨텐츠
+hash_txt = open('C:/Users/tera/Desktop/text/hash_keywords.txt', 'r', encoding='utf8') #해시태그
+
+content_desc = content_txt.readlines() #컨텐츠 리드라인으로 긁어오자
+hash_desc = hash_txt.readlines() #해시 리드으로 긁어오자
+
+#status = '테스트입니다.'
+
+for i in range(0, 55) :
+    imagePath = img_file_lists[i]
+    hash_tags = hash_desc[i] #해시태그
+    hash_tags_2 = hash_tags.replace('	', ' ') #해시태그수정
+    status = str(content_desc[i]) + str(hash_tags_2)
+    #status = '테스트입니다.  #애플워치스트랩'
+    
+    #imagePath = 'C:/Users/tera/Desktop/업무/테라상사_브랜드로고.jpg'
+    #status = "테스트입니다."
+    try :
+        api.update_status_with_media(status, imagePath)
+        print(str(i) + "번째 포스팅 완료")
+    except :
+        print(str(i) + "번째 포스팅 완료못함")
+    time.sleep(1800) #30분 간격
+    
+    #imagePath = img_file_lists[i]
+    #status = str(content_desc[i]) #본문 및 해시태그
+    #try :
+        #api.update_with_media(imagePath, status) #포스팅 완료
+        #api.update_status(status=status)
+        #print(str(i) + "번째 포스팅을 완료했습니다.")
+    #except :
+        #print(str(i) + "번째 포스팅을 완료하지 못했습니다.")
+    #time.sleep(60) #1분 간격
+print("최종 포스팅 완료")
