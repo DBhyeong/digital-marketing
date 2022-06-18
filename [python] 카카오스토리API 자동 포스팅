@@ -1,0 +1,110 @@
+#이미지 디렉토리 
+
+import requests
+import json
+import os, subprocess
+import glob
+from PIL import Image
+import numpy as np
+import cv2
+
+img_file_lists = [] #이미지 내에 압축된 이미지 파일 리스트 담기
+
+directory = 'C:/Users/tera/Desktop/upload' #경로
+
+file_list = glob.glob(f"{directory}/submit_img_*.jpg")  #해당 파일만 리스트화
+
+for f in file_list :
+    f_2 = f.replace("\\", "/") #디렉토리 필터링
+    img_file_lists.append(f_2) #리스트 담기
+print("리스트업 완료")
+
+#인증정보
+
+import requests
+import json
+
+#인증정보
+
+#https://developers.kakao.com/tool/rest-api/open/get/v1-api-story-isstoryuser 
+#카카오 로그인 이후 해당 url에서 액세스 토큰 발급 받아야됨
+
+url = "https://kapi.kakao.com/v1/api/story/isstoryuser"  #카카오스토리 사용자인지 확인
+
+access_token ='' #계정토큰
+
+#url = 'https://kapi.kakao.com/v1/api/story/profile' 프로필 가져오기
+
+#queryString = {'query' : '테라상사'}
+header = {'Authorization': 'Bearer 계정토큰 입력'}  #해당 발급받은 액세스 토큰 입력
+
+response = requests.get(url, headers=header)
+tokens = response.json()
+
+print(response) #응답  200시 인증완료
+print(tokens) #결과물 출력시 완료
+
+#자동 포스팅
+
+import requests
+import json
+import time
+
+#n = 1
+
+content_txt = open('C:/Users/tera/Desktop/text/contents_kakaostory.txt', 'r', encoding='utf8') #컨텐츠
+hash_txt = open('C:/Users/tera/Desktop/text/hash_keywords_kakaostory.txt', 'r', encoding='utf8') #해시태그
+
+content_desc = content_txt.readlines() #컨텐츠 리드라인으로 긁어오자
+hash_desc = hash_txt.readlines() #해시 리드으로 긁어오자
+
+for i in range(10, 55) :
+    upload_photo_url = 'https://kapi.kakao.com/v1/api/story/upload/multi'
+    post_photo_url = 'https://kapi.kakao.com/v1/api/story/post/photo'
+
+    access_token ='' #해당 계정 토큰 입력
+
+    header = {'Authorization': 'Bearer 토큰입력'}  #해당 계정 토큰 입력
+    
+    filepath = img_file_lists[i] #리스트 내 파일 주소 담기
+    
+    files = {'file': open(filepath, 'rb')} #파일주소
+
+    upload_result = requests.post(upload_photo_url, headers=header, files=files)
+
+    #print(upload_result)
+
+    #content = '안녕하세요'
+
+    #url='http://dn-l1-story.kakao.co.kr/dn/snD5Z/hyN5GynbFQ/tBQwAIdseoCThb7DlK8qgK/img.jpg?width=780&height=2596'
+
+    
+    content = str(content_desc[i]) + '\n' + '\n'  #본문
+    content += str(hash_desc[i])  #해시태그
+        
+    
+    #content='안녕하세요, 테라상사입니다.' +'\n'  #문구입력
+    #content+='애플워치 투명스트랩을 출시하였습니다.'  +'\n'   #문구입력
+    #content+='더 정확한 제품을 확인하고 싶으시면 네이버에 테라상사로 검색하시면 스마트스토어 내에서 더 자세히 살펴보실 수 있습니다.' +'\n' +'\n'  #문구입력
+    #content+=' #애플워치투명스트랩 #투명스트랩 #애플스트랩 #애플워치se스트랩 #애플워치스트랩'  #해시태그
+
+    post_photo_payload = {'image_url_list': upload_result.text,  #이미지업로드
+                         'content' : content} #컨텐츠
+
+    try :
+        post_result = requests.post(post_photo_url, headers=header, data=post_photo_payload)
+        print(str(i) + "번쨰 포스팅 완료했습니다.")
+    except :
+        print(str(i) + "번째 포스팅을 완료하지 못했습니다.")
+
+    #response = requests.get(url, headers=header)
+    #tokens = response.json()
+
+    #print(response) #응답
+    #print(tokens) #결과물
+    #확인 완료
+    
+    time.sleep(120) #2분 간격 조정
+    #print(post_result) #완료
+    
+print("포스팅이 최종 제출 완료되었습니다.")
