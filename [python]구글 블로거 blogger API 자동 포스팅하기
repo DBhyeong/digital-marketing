@@ -1,0 +1,53 @@
+# 구글 블로거 API 인증 (2번 해야됨)
+
+import sys
+import os
+import pickle
+from oauth2client import client
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+
+BLOG_ID = "" #블로거ID 입력
+#SCOPES = ['https://www.googleapis.com/auth/blogger', 'https://www.googleapis.com/auth/drive.file']
+
+SCOPES = ['https://www.googleapis.com/auth/blogger']
+
+def get_blogger_service_obj():
+    creds = None
+    if os.path.exists('auto_token.pickle'):
+        with open('auto_token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'C:/Users/user/blogger/client_secret.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('auto_token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+    blog_service = build('blogger', 'v3', credentials=creds)
+    drive_service = build('drive', 'v3', credentials=creds)
+
+    return drive_service,blog_service
+
+drive_handler, blog_handler = get_blogger_service_obj()
+
+#블로거 포스팅
+
+keyword = '테스트' #태그
+blogger_title =  '얏호 테스트입니다.' #블로그제목
+content =  '안녕하세요 테스트입니다.' #내용
+
+data = {
+'content': content,
+'title': blogger_title,
+'labels' : keyword,
+'blog': {
+    'id': BLOG_ID, # The identifier of the Blog that contains this Post.
+  },}
+posts = blog_handler.posts()
+res = posts.insert(blogId=BLOG_ID, body=data, isDraft=False, fetchImages=True).execute() 
+res #결과물
