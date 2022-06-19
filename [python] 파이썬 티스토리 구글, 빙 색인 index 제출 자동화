@@ -1,0 +1,137 @@
+#사이트맵 URL 모으기
+
+import advertools as adv
+
+sitemap_urls = adv.sitemap_to_df("https://dataanalytics.tistory.com/sitemap.xml") #사이트맵 URL 
+
+url = sitemap_urls["loc"].to_list()
+
+submit_urls = [] #제출용
+
+for i in url :
+    text = i.find('/entry')
+    if text == 33 :  #PC 기준만
+        submit_urls.append(i)
+
+        
+f = open('C:/Users/user/raw/submit_urls/submit_urls.txt', 'w', encoding='utf8') #메모장에 넣자
+
+for submit_url in submit_urls :
+    f.write(submit_url + '\n')
+f.close()
+
+
+# 구글 색인 요청 
+
+from oauth2client.service_account import ServiceAccountCredentials
+import httplib2
+import json
+import time
+
+f = open('C:/Users/user/raw/submit_urls/submit_urls.txt', 'r',  encoding='utf8') 
+
+url_lists = f.readlines()
+
+#len(url_lists)
+
+for url in url_lists[1:2] : #갯수조정
+    
+    JSON_KEY_FILE = "C:/Users/user/raw/google_index_api/credentials.json"   #refresh 체크해서 키 새로 발급해줘야됨
+
+    SCOPES = [ "https://www.googleapis.com/auth/indexing" ]
+    ENDPOINT = "https://indexing.googleapis.com/v3/urlNotifications:publish"
+
+
+    # Authorize credentials
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(JSON_KEY_FILE, scopes=SCOPES)
+    http = credentials.authorize(httplib2.Http())
+
+    # Build the request body
+    print(url) #색인요청한 URL
+    content = {}
+    content['url'] = url
+    content['type'] = "URL_UPDATED"
+    json_content = json.dumps(content)
+    response, content = http.request(ENDPOINT, method="POST", body=json_content)
+    result = json.loads(content.decode()) 
+    print(result)   #결과
+    
+    time.sleep(30)  #30초마다 한건씩
+print("최종 URL 제출 완료되었습니다.")
+
+# 빙색인 요청
+
+import advertools as adv #설치완료
+import pandas as pd
+import requests
+import json
+import time
+import requests
+import json
+import time
+import  datetime
+import dateutil.parser
+from bs4 import BeautifulSoup as bp
+
+sitemap_urls = adv.sitemap_to_df("https://dataanalytics.tistory.com/sitemap.xml") #사이트맵 URL 
+
+key = ""   #해당 키복사 입력
+url = sitemap_urls["loc"].to_list()
+
+def get_(data):
+    headers={'User-Agent':'curl/7.12.1 ',
+             'Content-Type':'application/json'}
+    try:
+        r = requests.post(url='https://ssl.bing.com/webmaster/api.svc/json/SubmitUrl?apikey='+str(key),json=data)
+        print(r.status_code)
+        print(r.content)
+    except Exception.e:
+        print(e)
+    
+    
+print('start....','utf-8')
+time.sleep(0.5)
+
+site_url = 'https://dataanalytics.tistory.com/sitemap.xml' #사이트맵
+
+try:
+    print('Get sitemap....','utf-8')
+    data_ = bp(requests.get(site_url).content,'lxml')
+except Exception.e:
+    print(e)
+
+list_url=[]  #url 담기
+list_date=[] #이건 필요없음
+
+print('---------------------------------')
+#for x1,y1 in enumerate(data_.find_all('url')):
+for x,y in enumerate(data_.find_all('loc')):
+    print(x,y.string)
+    list_url.append(y.string)
+
+for x2,y2 in enumerate(data_.find_all('lastmod')):
+    startTime=y2.string
+    startTime=dateutil.parser.parse(startTime)
+    date1=(startTime.isoformat())[0:10]
+    startTime=date1+" "+(startTime.isoformat())[11:19]
+    startTime=datetime.datetime.strptime(startTime,"%Y-%m-%d %H:%M:%S")
+    now=datetime.datetime.utcnow()
+    endTime = datetime.datetime(now.year, now.month, now.day, now.hour, now.minute, now.second)
+    date2=(endTime.isoformat())[0:10]
+    date = endTime- startTime
+    seconds=date.seconds
+    if date1==date2 and seconds<600:#Can be modified
+        list_date.append(x2)
+
+print('---------------------------------')
+print(list_date)
+print('submit....','utf-8')
+
+
+for i in url[1:334] : #해당 URL 제출 중복 여부 확인해야됨 #하루에 100건만 가능 (중요) 1만건도 있음!
+    cjhurl = str(i)
+    cjhpush={"siteUrl": "https://dataanalytics.tistory.com",#URL 주소 입력
+            "url": cjhurl
+            }
+    print(cjhpush)
+    get_(cjhpush)
