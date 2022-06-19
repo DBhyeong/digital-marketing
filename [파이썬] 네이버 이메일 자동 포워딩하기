@@ -1,0 +1,48 @@
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.mime.application import MIMEApplication
+
+#메일 수신자 메일 리스트 붙여넣기
+
+recvEmails = ['test@naver.com']  #받을 이메일 대상자
+n = 1
+
+for recvEmail in recvEmails :
+    smtpName = "smtp.naver.com"                 
+    smtpPort = '587'
+
+    sendEmail = ""  #보내는자 메일
+    password = ""  #보내는자 비밀번호
+
+	#메일제목
+    
+    title = '테스트'
+
+    #메일내용
+    content = '안녕하세요,' +'\n' +'\n'
+    content += '테스트입니다.' +'\n'
+
+    
+    msg = MIMEText(content)  #메일 컨텐츠                     
+    msg['From'] = sendEmail #발송자
+    msg['To'] = recvEmail #수신자
+    msg['Subject'] = title #메일 제목         
+
+    s = smtplib.SMTP(smtpName , smtpPort)         
+    s.starttls()                                
+    s.login(sendEmail , password)                 
+    try :
+        s.sendmail(sendEmail, recvEmail, msg.as_string()) 
+        print(str(recvEmail) + " 의 최종 메일 보내기 완료되었습니다.") 
+    except :
+        print(str(recvEmail) + " 의 최종 메일을 보내는걸 실패했습니다.") 
+	
+    print(str(n) + " 번째 최종 메일 보내기 완료되었습니다.")   #완료 메시지
+    n +=1
+    
+    s.close() #종료
+    time.sleep(60) #1분간격
+
+print("최종 메일 보내기가 완료되었습니다.")
