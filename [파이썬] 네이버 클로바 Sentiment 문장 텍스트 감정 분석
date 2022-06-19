@@ -1,0 +1,73 @@
+#메모장에 넣어 이용해보기
+
+import json
+
+file = open('C:/Users/user/raw/naver_blog/positive_negative_text_result.txt', 'w', encoding='utf8') #결과파일
+
+n = 1 #첫번째
+m = 800  #두번째
+
+for i in range(1, 2) : #41번
+    client_id = ""  #클라이언트 키
+    client_secret = "" #클라이언트 시크릿 키
+
+    url="https://naveropenapi.apigw.ntruss.com/sentiment-analysis/v1/analyze"
+
+    headers = {
+        "X-NCP-APIGW-API-KEY-ID": client_id,
+        "X-NCP-APIGW-API-KEY": client_secret,
+        "Content-Type": "application/json"
+    }
+
+    f = open('C:/Users/user/raw/naver_blog/blog_content.txt', 'r', encoding='utf8')
+    text = f.read()
+    text_2 = text.replace("\n", "")
+    text_3 = text_2.replace("________________", " ")
+
+    content = text_3[n:m] #800단어씩
+
+    data = {
+      "content": content
+    }
+    print(json.dumps(data, indent=4, sort_keys=True))
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    rescode = response.status_code
+    if(rescode == 200):
+        print (response.text)
+    else:
+        print("Error : " + response.text)
+
+    f.close()    
+
+    text = response.json()
+
+    raw = text['sentences']
+
+
+    max_cnt = len(raw) #리스트 개수
+
+    for i in range(0, max_cnt) : 
+        content = str(raw[i]['content']) #텍스트
+        offset = int(raw[i]['highlights'][0]['offset']) #오프셋
+        length = int(raw[i]['highlights'][0]['length']) #해당 길이
+        text = content[offset : offset + length] #부정 의미가 있는 문구 텍스트 추출
+        #print(text)
+        file.write(str(text) + '\n')
+    
+    n += 800
+    m += 800
+
+file.close()
+
+
+#긍정 텍스트만 뽑아보자
+
+max_cnt = len(raw) #리스트 개수
+
+for i in range(0, max_cnt) :
+    if (raw[i]['sentiment'] == 'positive') : #긍정 의미를 가질경우
+        content = str(raw[i]['content']) #텍스트
+        offset = int(raw[i]['highlights'][0]['offset']) #오프셋
+        length = int(raw[i]['highlights'][0]['length']) #해당 길이
+        text = content[offset : offset + length] #긍정 의미가 있는 문구 텍스트 추출
+        print(text)
