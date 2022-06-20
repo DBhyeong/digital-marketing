@@ -1,0 +1,90 @@
+#access_token 받기1
+
+import requests
+import re
+
+app_id = ''  #appid키 입력
+secret_key = '' #secret_key 키 입력
+
+callback_uri ='' #티스토리 주소 입력
+
+# authentication_code 얻기 
+url = 'https://www.tistory.com/oauth/authorize?client_id=' + app_id + '&redirect_uri=' + callback_uri + '&response_type=code'
+
+print(url) #url 클릭
+
+#access_token 받기 & 인증
+ 
+authentication_code = '' #해당 code 입력
+
+url_2 = 'https://www.tistory.com/oauth/access_token'
+
+params = { 'client_id': app_id, 
+          'client_secret': secret_key, 
+          'redirect_uri': callback_uri, 
+          'code': authentication_code, 
+          'grant_type': 'authorization_code' }
+
+res = requests.get(url_2, params=params)
+
+if res.status_code == 200: 
+    print(res.text.replace('access_token=','')) 
+else: 
+    print(res) #access_token 최종 받기
+    
+#access_token을 통한 인증확인
+
+import requests 
+
+appid = ""  #앱ID 입력
+access_token = "" #access_token 입력
+callback_url = ""  #티스토리 주소 입력
+blogName = "" #티스토리 주소 입력
+
+url = "https://www.tistory.com/apis/category/list"
+params = { 'access_token': access_token, 
+              'output': 'json',
+              'blogName': blogName }
+
+res = requests.get(url, params=params)
+if res.status_code == 200:
+    res_json = res.json()
+    print(res_json)
+    
+#최종 티스토리 이미지 업로드
+
+import requests 
+import json
+
+blogName = '' #티스토리 블로그 이름 입력
+access_token = '' # 액세스토큰입력
+tistory_url = 'https://www.tistory.com/apis/post/write' #url
+
+test_image_path = '' 이미지 디렉토리 입력
+
+files = {'uploadedfile': open(test_image_path, 'rb')}
+params = {'access_token': access_token, 'blogName': blogName, 'targetUrl': blogName, 'output': 'json'}
+rd = requests.post('https://www.tistory.com/apis/post/attach', params=params, files=files)
+item = json.loads(rd.text)
+test_image = item["tistory"]["replacer"]
+
+tags = "테스트1, 테스트2, 테스트3, 테스트4"  #태그는 쉼표로 구분
+
+title = '[테스트] 테스트입니다.'  #제목
+content = '<p data-ke-size="size16">테스트입니다.</p>' #본문
+content += '<p data-ke-size="size16">테스트입니다.</p>'
+content += '<p>'+ test_image +'</p>'
+
+parameters = {
+    'access_token' : access_token,
+    'output' : '{output-type}',
+    'blogName' : blogName,
+    'title' : title,
+    'content' : content,
+    'visibility' : '3',
+    'category' : '48508',
+    'tag' : tags,
+    'acceptComment' : '1'
+}
+
+requests.post(tistory_url, params=parameters)  #최종완료 Response가 200일시 완료임.
