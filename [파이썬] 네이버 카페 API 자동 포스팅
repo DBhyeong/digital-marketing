@@ -1,0 +1,66 @@
+#키입력
+
+redirect_uri = 'https://localhost:8888/'
+
+client_id = ''  #키입력
+client_secret = '' #키입력
+
+state = "REWERWERTATE"
+
+#코드 발급
+url = f'https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id={client_id}&redirect_uri={redirect_uri}&state={state}'
+print(url) #밑에 링크 클릭하자
+
+
+#액세스토큰 발급
+
+import  hashlib
+import  hmac
+import  base64
+import requests
+
+#access token 발급 
+code = '' #해당 코드 입력
+
+clientConnect = client_id + ":" + client_secret
+clidst_base64 = base64.b64encode(bytes(clientConnect, "utf8")).decode()
+url = f'https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id={client_id}&client_secret={client_secret}&redirect_uri={redirect_uri}&code={code}&state={state}'
+r = requests.get(url,headers={"Authorization": "Basic "+clidst_base64})
+print(r.text) #밑에 나올시 access_token 토큰 복사
+
+
+#네이버카페API 포스팅
+
+import  urllib.request
+
+access_token = "" #access_token 입력
+header = "Bearer " + access_token # Bearer 다음에 공백 추가
+clubid = "" # 카페의 고유 ID값 http://cafe.naver.com/apiexam
+menuid = "" #메뉴 ID 값
+url = "https://openapi.naver.com/v1/cafe/" + clubid + "/menu/" + menuid + "/articles"
+
+title = '테스트입니다.' #제목 
+subject = urllib.parse.quote(title) #제목
+
+content = '테스트입니다.' #본문
+description = urllib.parse.quote(content) #본문     
+
+data = {'subject': subject, 'content': description, 'openyn' : True } #데이터 입력 (공개 데이터 기준)
+
+#이미지 경로
+
+imagePath = 'C:/Users/tera/Desktop/upload/submit_img_2.jpg'
+
+files = [('image', ('테스트.jpg', open(imagePath, 'rb'), 'image/jpeg', {'Expires': '0'}))]
+
+headers = {'Authorization': header } 
+try :
+    response = requests.post(url, headers=headers, data=data, files=files)
+    #rescode = response.status_code
+    #if(rescode==200):
+    #    print (response.text)
+    #else:
+    #    print(rescode)
+    print("포스팅완료")
+except :
+    print("포스팅실패")
