@@ -1,0 +1,80 @@
+#인증받기
+
+import sys
+import os
+import pickle
+from oauth2client import client
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+
+BLOG_ID = "blogname" #blogname
+SCOPES = ['https://www.googleapis.com/auth/blogger', 'https://www.googleapis.com/auth/drive.file']
+
+def get_blogger_service_obj():
+    creds = None
+    if os.path.exists('auth_token.pickle'):
+        with open('auth_token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'C:/Users/tera/Desktop/blogger/client_secret.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('auth_token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+    blog_service = build('blogger', 'v3', credentials=creds)
+    drive_service = build('drive', 'v3', credentials=creds)
+
+    return drive_service,blog_service
+
+drive_handler, blog_handler = get_blogger_service_obj()
+
+
+#텍스트만
+
+keyword = '테스트'
+blogger_title =  '안녕하세요, 테스트입니다.'
+content = '안녕하세요, 테스트입니다.'
+#content += '<meta content="0; URL='+str(blogger_redirect_url)+'" http-equiv="Refresh"></meta>'
+data = {
+'content': content,
+'title': blogger_title,
+'labels' : keyword,
+'image' : 
+'blog': {
+    'id': BLOG_ID, # The identifier of the Blog that contains this Post.
+  },}
+posts = blog_handler.posts()
+res = posts.insert(blogId=BLOG_ID, body=data, isDraft=False, fetchImages=True).execute() 
+res
+
+
+
+#이미지와 함께 업로드
+
+keyword = '테스트'
+blogger_title =  '테스트, 테스트입니다.'
+
+imagepath = 'https://thumbnail7.coupangcdn.com/thumbnails/remote/492x492ex/image/retail/images/2923947400702826-2c36a46e-a996-4eee-8420-0deb6e9eb7f8.jpg'  #이미지 URL 주소
+
+content = '<b>필수로 설치해야될 파이썬 패키지 리스트</b></p>'
+#content += '<div style="text-align: center;">'
+content += '<div class="separator" style="clear: both; text-align: center;">'
+content += '<a href="'+imagepath+'" imageanchor="1" style="margin-left: 1em; margin-right: 1em;">'
+content += '<img border="0" data-original-height="492" data-original-width="492" height="492" src="'+imagepath+'" width="492" /></a></div><br /><div><br /></div>'
+
+#content += '<meta content="0; URL='+str(blogger_redirect_url)+'" http-equiv="Refresh"></meta>'
+data = {
+'content': content,
+'title': blogger_title,
+'labels' : keyword,
+'blog': {
+    'id': BLOG_ID, # The identifier of the Blog that contains this Post.
+  },}
+posts = blog_handler.posts()
+res = posts.insert(blogId=BLOG_ID, body=data, isDraft=False, fetchImages=True).execute() 
+res
