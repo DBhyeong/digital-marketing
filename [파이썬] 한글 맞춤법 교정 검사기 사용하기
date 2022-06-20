@@ -1,0 +1,63 @@
+#문장확인하기
+
+from hanspell import spell_checker
+
+content = '여름에 가만히 시계를 차고만 있어도 손목에 땀이 차는 경험이 다들 있으실 거예요.'
+content += '저도 땀이 많아서 여름에 시계 찰 때 신경을 많이 쓰는데요,'
+content +='여름 대비용으로 시원하게 착용할 만한 스트랩을 소개해드릴게요.'
+content +='여름에 가죽 스트랩을 차면  통풍이 잘 안돼서 땀차고요.'
+content +='나중에는 가죽에 꾸리꾸리 땀 냄새가 배어서 처치 골란 해지는데요.'
+content +='여름에는 이러한 걱정없이 편하게 착용할 수 있는 투명 스트랩이 최고종.'
+content +='데일리로 착용하기 좋은 투명 파츠 스트랩을 제공을 받았는데요.'
+content +='여름이 되기 전에 사용해 볼 수 있어서 너무 좋네요.'
+
+result = spell_checker.check(content)
+ 
+print(result.as_dict())  #결과물 전문
+
+print(result.result) #결과 요청 성공 여부 출력
+
+print(result.errors) #결과 내 에러 건수 출력
+
+
+#원본 및 교정된거 비교하기
+
+text = result.as_dict()
+
+text['original']  #원본
+text['checked']  #바뀐거
+
+#500자 기준으로 리스트에 넣어서 확인하기
+
+from hanspell import spell_checker
+
+content = '여름에 가만히 시계를 차고만 있어도 손목에 땀이 차는 경험이 다들 있으실 거예요.'
+content += '저도 땀이 많아서 여름에 시계 찰 때 신경을 많이 쓰는데요,'
+content +='여름 대비용으로 시원하게 착용할 만한 스트랩을 소개해드릴게요.'
+content +='여름에 가죽 스트랩을 차면  통풍이 잘 안돼서 땀차고요.'
+content +='나중에는 가죽에 꾸리꾸리 땀 냄새가 배어서 처치 골란 해지는데요.'
+content +='여름에는 이러한 걱정없이 편하게 착용할 수 있는 투명 스트랩이 최고종.'
+content +='데일리로 착용하기 좋은 투명 파츠 스트랩을 제공을 받았는데요.'
+content +='여름이 되기 전에 사용해 볼 수 있어서 너무 좋네요.'
+
+content_convert = content.replace('.', '.#').split('#')  #리스트화
+
+#print(content_convert) #확인완료
+
+content_list = [""]  #500자 채워지면 넣을거
+
+#500자 까지 채워서 content_list 리스트에 집어넣기
+
+for i in content_convert :
+    #print(i)
+    if len(content_list[-1]) + len(i) < 500 :
+        content_list[-1] += i  #500까지 채우기
+        #print(content_list)
+    else :
+        content_list.append(i) #500자 되면 리스트 집어넣기
+
+result = spell_checker.check(content_list) #교정받자
+result_text = result[0].as_dict() #결과 전문
+print(result_text['original']) #원본
+print('------------------------------') #원본
+print(result_text['checked']) #교정
