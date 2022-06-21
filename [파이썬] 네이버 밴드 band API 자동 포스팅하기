@@ -1,0 +1,42 @@
+#밴드키 보기
+
+import json
+import requests
+from pprint import pprint
+from urllib import request
+
+
+token = '' #access_token 입력
+
+def get_bands(): #밴드목록
+    url = f'https://openapi.band.us/v2.1/bands?access_token={token}'
+    req = request.Request(url)
+    res = request.urlopen(req)
+    decoded = res.read().decode("utf8")
+    json_dict = json.loads(decoded)
+    return json_dict
+
+pprint(get_bands())  #밴드키 보자
+
+
+
+#밴드키 보기
+
+#밴드 포스팅
+
+token = '' #access_token 입력
+band_key = '' #terakorea  밴드키
+do_push=True
+
+content= '테스트입니다.' + '\n' #상품명 입력
+content+= '테스트입니다.' 
+
+url = 'https://openapi.band.us/v2.2/band/post/create'
+data = {'access_token': token, 'band_key': band_key, 'content': content, 'do_push': do_push}
+resp = requests.post(url, data) 
+
+try :
+    json_dict = json.loads(resp.text)
+    print("포스팅완료")
+except :
+    print("포스팅완료못함")
