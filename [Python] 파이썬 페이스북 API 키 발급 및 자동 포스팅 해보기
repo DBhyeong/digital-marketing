@@ -1,0 +1,20 @@
+import requests
+
+#Your Access Keys
+page_id_1 = ''  #페이스북 페이지 ID
+
+#페이스북 액세스 토큰 발급
+facebook_access_token_1 = ''  #액세스토큰 넣기
+
+
+msg = '안녕하세요, #테스트'
+image_url = 'https://graph.facebook.com/{}/photos'.format(page_id_1)
+image_location = '이미지 디렉토리.jpg' #이미지 URL 주소
+img_payload = {
+'url': image_location, #이미지 주소 URL
+'access_token': facebook_access_token_1,
+'message': msg #내용물
+}
+#Send the POST request
+r = requests.post(image_url, data=img_payload)
+print(r.text)
