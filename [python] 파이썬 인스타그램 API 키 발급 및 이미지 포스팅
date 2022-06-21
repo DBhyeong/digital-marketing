@@ -1,0 +1,53 @@
+#인스타그램 비즈니스 계정 ID 발급받기
+
+import requests
+import config
+import json
+
+page_id_1 = '' #페이스북ID 입력
+
+access_token = '' #액세스 토큰 입력
+post_url = 'https://graph.facebook.com/v13.0/' + str(page_id_1) + '?fields=instagram_business_account&access_token=' + str(access_token)
+
+r = requests.get(post_url)
+
+#print(r.text)
+
+insta_biz_acc = r.json() 
+
+ig_user_id = insta_biz_acc['instagram_business_account']['id']
+
+print(ig_user_id)  # 인스타그램 비즈니스 계정 ID
+
+#인스타그램 비즈니스 계정 ID 발급받기
+
+# post 캡션 ID
+
+image_location_1  = '' #이미지 URL 주소 입력
+
+post_url = 'https://graph.facebook.com/v13.0/{}/media'.format(ig_user_id)
+
+payload = {
+    'image_url': image_location_1,
+    'caption': '' #해시태그 및 기타 입력 ,
+    'access_token': access_token
+    }
+r = requests.post(post_url, data=payload)
+print(r.text)  #캡션 ID 
+
+result = json.loads(r.text)
+if 'id' in result:
+    creation_id = result['id']
+
+second_url = 'https://graph.facebook.com/v13.0/{}/media_publish'.format(ig_user_id)
+second_payload = {
+'creation_id': creation_id,
+'access_token': access_token
+
+}
+try :
+    r = requests.post(second_url, data=second_payload)
+    print('--------Just posted to instagram--------')
+    print(r.text)
+except:
+    print('HOUSTON we have a problem')
