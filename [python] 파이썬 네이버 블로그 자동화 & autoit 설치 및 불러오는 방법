@@ -1,0 +1,251 @@
+!pip install pyautoit
+
+#pyautoit 는 반드시 import autoit 로 불러와야됨.
+
+#밑에는 네이버 블로그 포스팅 기준 (밑에 subprocess 운용시 파일 경로 확인이 필요함!)
+
+import  warnings
+import  shutil 
+import subprocess
+from    selenium import webdriver
+from    selenium.webdriver.chrome.options import Options
+from    selenium.webdriver.common.alert import Alert
+from    selenium.webdriver.common.keys import Keys 
+from    selenium.webdriver.common.action_chains import ActionChains
+from    selenium.common.exceptions import NoSuchElementException,StaleElementReferenceException
+from    selenium.webdriver.support import expected_conditions as EC
+
+import  chromedriver_autoinstaller
+import  time
+import  pyperclip
+import  requests
+import  datetime
+import  autoit #autoit 프로그램 깔아야됨(완료)
+
+warnings.filterwarnings('ignore')
+
+try:
+    shutil.rmtree(r"c:\chrometemp")  #쿠키 / 캐쉬파일 삭제
+except FileNotFoundError:
+    pass
+subprocess.Popen(r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\chrometemp"') # 디버거 크롬 구동
+option = Options()
+option.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+chrome_ver = chromedriver_autoinstaller.get_chrome_version().split('.')[0]
+try:
+    driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe', options=option)
+except:
+    chromedriver_autoinstaller.install(True)
+    driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe', options=option)
+driver.maximize_window() #최대창
+time.sleep(3)    
+driver.implicitly_wait(10)
+
+action = ActionChains(driver) #액션지정
+
+#네이버 이동
+
+url = 'https://www.naver.com'
+driver.get(url)
+time.sleep(5)
+driver.implicitly_wait(10)
+
+driver.find_element_by_class_name('link_login').click()
+time.sleep(1)
+driver.implicitly_wait(10)
+
+#id, pw 입력할 곳 찾기
+
+tag_id = driver.find_element_by_name('id')
+tag_pw = driver.find_element_by_name('pw')
+driver.implicitly_wait(10)
+
+#id 입력
+
+tag_id.click()
+pyperclip.copy('') # 아이디입력
+tag_id.send_keys(Keys.CONTROL, 'v')
+time.sleep(2)
+driver.implicitly_wait(10)
+
+#pw 입력
+
+tag_pw.click()
+pyperclip.copy('') # 비번입력
+tag_pw.send_keys(Keys.CONTROL, 'v')
+time.sleep(2)
+driver.implicitly_wait(10)
+
+#로그인 버튼 클릭
+
+login_btn = driver.find_element_by_id('log.login')
+login_btn.click()
+time.sleep(1)
+driver.implicitly_wait(10)
+
+#네이버 블로그 주소로 이동
+
+url = '' #블로그주소 이동
+driver.get(url)
+time.sleep(3)
+driver.implicitly_wait(10)
+
+#글쓰기 버튼 클릭
+
+driver.switch_to.frame("mainFrame") #아이프레임
+time.sleep(1)
+driver.find_element_by_xpath('//*[@id="post-admin"]/a[1]').click()
+time.sleep(3)
+
+#제목 입력
+
+main_keyword ='' #입력
+
+keywords = [''   #키워드입력   
+]
+
+# 상품 키워드 입력
+
+tag = str(main_keyword) + '  ' + str(main_keyword) +'추천  '
+
+# 제목 입력
+tag_title = driver.find_element_by_xpath('//span[contains(text(),"제목")]') #Span 클래스 내 "제목" 단어 찾기
+tag_title.click()  # "제목" 클릭
+time.sleep(1) 
+title = str(main_keyword) + ' 추천입니다.'
+time.sleep(1) 
+action.send_keys(title).perform()  #입력
+action = ActionChains(driver) #초기화
+time.sleep(1)
+driver.implicitly_wait(10)
+
+#본문 입력
+
+#초대말 입력
+
+tag_content = driver.find_element_by_xpath('//span[contains(text(),"본문에")]')  #본문입력
+tag_content.click() #클릭
+time.sleep(1) 
+content_1 = '지금부터 소개할 '+str(main_keyword)+ ' 은 여러 제품 출시 소식으로 현재 아주 다양한 제품이 속속 등장하고 있습니다.' + '\n'
+content_1 += '이에 온라인 반응이 핫한 '+str(main_keyword)+' 를 5개 정도 뽑아보았는데요,' +'\n'
+content_1 += '사실 '+str(main_keyword)+' 를 사용 목적에 맞게 구입을 하면 불필요한 소비 또한 줄일 수가 있다고 생각이 드네요.' +'\n'
+content_1 += '그리고 본 추천은 필자가 추린 가성비 가격, 성능 비교를 고려한 '+str(main_keyword)+'라는 점 다시 한번 참고하길 바라겠습니다. '  + '\n' +'\n'
+action.send_keys(content_1).perform() #입력
+action = ActionChains(driver)  #초기화
+time.sleep(2)
+driver.implicitly_wait(10)
+
+for num in range(1,2) :
+    r = num-1
+    keyword = str(keywords[r])
+    #제품 설명 (소제목)
+    content_2 = str(main_keyword) +' '+ str(keyword) + '\n' + '\n'
+    #content_2 += str(keyword) + ' 는 있는 제품입니다.' + '\n' + '\n'
+    action = ActionChains(driver)
+    action.send_keys(content_2).perform()
+    time.sleep(2)
+    driver.implicitly_wait(10)
+
+    #사진 첨부
+
+    driver.find_element_by_xpath('//button[contains(@class,"se-")]').click() #사진 버튼 클릭
+    time.sleep(5) #5초 대기
+
+    handle = "[CLASS:#32770; TITLE:열기]" #Basic Window info 값 handle 변수에 저장
+    autoit.win_wait_active("열기", 3)  #이름이 '열기'인 창이 나올 때까지 3초간 대기
+
+    img_path = "C:/Users/tera/Desktop/upload_2/submit_img_"+str(num)+".jpg" #이미지경로
+    img_path_2 = img_path.replace('/', '\\') # 백슬래시는 두번 써야됨
+
+    autoit.control_send(handle, "Edit1", img_path_2) #사진 클릭시 나오는 윈도우 창에서 파일이름(N)에 이미지 경로값 전달
+    time.sleep(1)
+    autoit.control_click(handle, "Button1") #사진 클릭시 나오는 윈도우 창에서 Button1 클릭
+    time.sleep(1)
+
+    #제품 요약1
+
+    content_4  =  str(main_keyword) + ' ' + '추천 제품 요약' + '\n'
+    #content_4 +=  '<제품 확인하기 클릭>' + '\n'
+    #content_4 += '↓' + '\n'
+    content_4 +=  str(main_keyword) + ' ' + str(keyword) +' 는' + '\n' + '\n'
+
+    action = ActionChains(driver)
+    action.send_keys(content_4).perform()
+    time.sleep(2)
+    driver.implicitly_wait(10)
+
+    #제품 사용후기 리뷰(요약본)
+
+    content_5  = str(main_keyword) + ' ' +'추천 제품 사용후기 리뷰 (요약본) ' + '\n' + '\n'
+    #content_5 += '\n' + '\n'
+    content_5 += '*이는 제품 사양에 따라 다소 변경될 수 있습니다.'  + '\n' + '\n'
+
+    action = ActionChains(driver)
+    action.send_keys(content_5).perform()
+    time.sleep(2)
+    driver.implicitly_wait(10)
+
+    #제품 특징
+
+    content_6  = '제품 사용후기 자세히 보기' + '\n' +'\n'
+    #content_6 += '1. ' + '\n'
+
+    action = ActionChains(driver)
+    action.send_keys(content_6).perform()
+    time.sleep(2)
+    driver.implicitly_wait(10)
+
+#맺음말 입력
+
+content_9 = '\n' + '\n' 
+content_9 += '오늘은 ' + str(main_keyword)+' 추천 제품에 대해 알아봤습니다.' +'\n'
+content_9 += '주요 제품별 특징을 통해 여러분들께 다양한 정보를 전달해 드리고자 했는데, 어때요?' +'\n'
+content_9 += '만족스럽나요? 오늘 추천된 '+str(main_keyword) + ' 추천 제품 정보에 도움되시길 바랍니다.' + '\n'
+content_9 += '그럼 오늘도 즐거운 하루 되세요~' +'\n' +'\n' + '\n'
+
+action = ActionChains(driver)
+action.send_keys(content_9).perform()
+action = ActionChains(driver) #초기화
+time.sleep(2)
+driver.implicitly_wait(10)
+
+#댓가성문구 사진 첨부
+
+driver.find_element_by_xpath('//button[contains(@class,"se-")]').click() #사진 버튼 클릭
+time.sleep(5) #5초 대기
+
+handle = "[CLASS:#32770; TITLE:열기]" #Basic Window info 값 handle 변수에 저장
+autoit.win_wait_active("열기", 3)  #이름이 '열기'인 창이 나올 때까지 3초간 대기
+
+img_path = "C:/Users/tera/Desktop/업무/test.jpg" #이미지경로
+img_path_2 = img_path.replace('/', '\\') # 백슬래시는 두번 써야됨
+
+autoit.control_send(handle, "Edit1", img_path_2) #사진 클릭시 나오는 윈도우 창에서 파일이름(N)에 이미지 경로값 전달
+time.sleep(1)
+autoit.control_click(handle, "Button1") #사진 클릭시 나오는 윈도우 창에서 Button1 클릭
+time.sleep(1)
+
+#도움말 버튼 클릭
+
+try :
+    driver.find_element_by_xpath('//button[contains(@class,"se-help-panel-close-button")]').click()  #도움말 버튼 닫기 클릭
+except :
+    pass
+
+#태그 및 임시저장
+
+time.sleep(1)
+driver.find_element_by_xpath('//*[@id="root"]/div/div[1]/div/div[3]/div[3]/button/span').click() #발행1 버튼 클릭
+time.sleep(1)
+driver.find_element_by_xpath('//*[@id="tag-input"]').click() #태그 버튼 클릭
+time.sleep(1)
+action.send_keys(tag).perform() #태그 입력
+action = ActionChains(driver) #초기화
+time.sleep(1)
+driver.find_element_by_xpath('//*[@id="root"]/div/div[1]/div/div[2]/button[1]').click() #저장 버튼 클릭
+time.sleep(1)
+driver.implicitly_wait(10)
+
+print("end")
+driver.close()
+driver.quit()
