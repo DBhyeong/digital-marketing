@@ -1,0 +1,83 @@
+#텍스트 내 키워드 추출
+
+from konlpy.tag import Kkma, Okt, Komoran, Hannanum
+from konlpy.utils import pprint
+from collections import  Counter
+
+num = 2
+
+#f = open ('C:/Users/user/raw/products/product_info/product_'+str(num)+'.txt', 'r', encoding='utf-8')
+#f = open ('C:/Users/user/raw/products/product_info/test1.txt', 'r', encoding='utf-8')
+
+f = open ('C:/Users/user/Desktop/review_contents.txt', 'r', encoding='utf-8')
+
+
+text = f.read()
+
+#Kkma 객체 생성
+okt = Kkma()
+noun = okt.nouns(text)
+
+count = Counter(noun)
+
+#명사 빈도 카운트
+
+noun_list = count.most_common(200)
+for v in noun_list :
+    print("Kkma 기준 : "+ str(v))
+
+    
+#Okt 객체 생성
+okt = Okt()
+noun = okt.nouns(text)
+
+count = Counter(noun)
+
+#명사 빈도 카운트
+
+noun_list = count.most_common(200)
+for v in noun_list :
+    print("Okt 기준 : " + str(v))
+
+    
+#Komoran 객체 생성
+#okt = Komoran()
+#noun = okt.nouns(text)
+
+#count = Counter(noun)
+
+#명사 빈도 카운트
+
+#noun_list = count.most_common(10)
+#for v in noun_list :
+#    print("Komoran 기준: " + str(v))
+
+    
+#Hannanum 객체 생성
+okt = Hannanum()
+noun = okt.nouns(text)
+
+count = Counter(noun)
+
+#명사 빈도 카운트
+
+noun_list = count.most_common(200)
+for v in noun_list :
+    print("Hannanum 기준: " + str(v))
+    
+#텍스트 내 전체 텍스트 보기
+
+f = open ('C:/Users/user/Desktop/review_contents.txt', 'r', encoding='utf-8')
+text = f.read()
+#print(text)
+
+#텍스트 내 특정 키워드 들어간 텍스트 찾기
+file = open ('C:/Users/user/Desktop/review_contents.txt', 'r', encoding='utf-8')
+
+texts = file.readlines()
+
+for text in texts :
+    if text.find("교체") > 0 : #단어검색
+        print(text)
+    else :
+        pass
