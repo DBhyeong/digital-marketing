@@ -1,0 +1,251 @@
+##### 권한 인증 및 토큰 확인#####
+
+SCOPES = ["https://www.googleapis.com/auth/drive.file",
+"https://www.googleapis.com/auth/drive",
+"https://www.googleapis.com/auth/spreadsheets", 
+"https://www.googleapis.com/auth/documents"]
+
+creds = None
+
+# 이미 발급받은 Token이 있을 때
+
+if os.path.exists('token.pickle'):
+    with open('token.pickle', 'rb') as token:
+        creds = pickle.load(token)
+
+# 발급받은 토큰이 없거나 AccessToken이 만료되었을 때
+
+if not creds or not creds.valid:
+    if creds and creds.expired and creds.refresh_token:
+        creds.refresh(Request())
+    else:
+        flow = InstalledAppFlow.from_client_secrets_file('C:/Users/user/raw/credentials.json', SCOPES)
+        creds = flow.run_local_server(port=0)
+    # 현재 토큰 정보를 저장
+    
+    with open('token.pickle', 'wb') as token:
+        pickle.dump(creds, token)
+
+# 연결 인스턴스 생성
+
+service = build('drive', 'v3', credentials=creds)
+
+#####쿠팡 예시 이미지 텍스트로 변환하기#####
+
+warnings.filterwarnings('ignore')
+
+try:
+    shutil.rmtree(r"c:\chrometemp")  #쿠키 / 캐쉬파일 삭제
+except FileNotFoundError:
+    pass
+subprocess.Popen(r'C:\Program Files\Google\Chrome\Application\chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\chrometemp"') # 디버거 크롬 구동
+option = Options()
+option.add_argument('--no-sandbox')
+option.add_argument('--disable-gpu')
+option.add_argument('--disable-setuid-sandbox')
+option.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+chrome_ver = chromedriver_autoinstaller.get_chrome_version().split('.')[0]
+try:
+    driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe', options=option)
+except:
+    chromedriver_autoinstaller.install(True)
+    driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe', options=option)
+driver.maximize_window() #최대창
+time.sleep(2)
+driver.implicitly_wait(10)
+
+coupang_urls = ['https://www.coupang.com/vp/products/6518355982'                
+] 
+
+keyword = 'product' #고정
+
+coupang_shorten_urls = []
+product_titles = []
+
+# top 5 기준 긁자
+
+for n in range(1,6)  :
+    #result_url = 'https://partners.coupang.com/#affiliate/ws/link/0/'+str(keyword)
+    #driver.get(result_url)
+    #time.sleep(3)
+    #driver.implicitly_wait(10)
+    #상품 이미지 클릭
+    #driver.find_element_by_xpath('//*[@id="root"]/div/div/div[2]/div/div/div[1]/div/div/div[2]/div/div/div/div/div/div/section[3]/div/div[2]/div/div/div/div[1]/div['+str(n)+']/div[1]').click()
+    #time.sleep(2)
+    #driver.implicitly_wait(10)
+    #링크생성 클릭
+    #driver.find_element_by_xpath('//*[@id="root"]/div/div/div[2]/div/div/div[1]/div/div/div[2]/div/div/div/div/div/div/section[3]/div/div[2]/div/div/div/div[1]/div['+str(n)+']/div[1]/div/button[2]').click()
+    #time.sleep(2)
+    #driver.implicitly_wait(10)
+    #쿠팡 URL 복사
+    #coupang_url =driver.find_element_by_xpath('//*[@id="root"]/div/div/div[2]/div/div/div[1]/div/div/div[2]/div/div/div[2]/div/div/div/section/section[1]/div/div/div[1]').text
+    #coupang_shorten_urls.append(coupang_url) #URL 집어넣기
+    r = n-1
+    coupang_url = str(coupang_urls[r])
+    driver.get(coupang_url) #URL 호출
+    time.sleep(3)
+    driver.implicitly_wait(10)
+    
+    product_title = driver.find_element_by_xpath('//*[@id="contents"]/div[1]/div/div[3]/div[3]/h2').text #상품 제목 긁기
+    product_titles.append(product_title) #제목 넣기
+    
+    time.sleep(2)
+    driver.implicitly_wait(10)
+    
+    product_image = driver.find_element_by_xpath('//*[@id="repImageContainer"]/img') #상품 이미지
+    product_image_png = product_image.screenshot_as_png
+    with open("C:/Users/user/raw/products/"+keyword+"_상품이미지_"+str(n)+".png", "wb") as file: #상품 이미지 저장
+        file.write(product_image_png)
+    
+    time.sleep(2)
+    driver.implicitly_wait(10)
+    
+    ####구글 드라이브에 이미지 업로드 ####
+    
+    #folder_name = str(keyword) +"_상품이미지_"+str(n) 
+    #request_body = {'name': folder_name #폴더 이름명 생성
+    #                ,'mimeType': 'application/vnd.google-apps.folder'}  
+    #folder = service.files().create(body=request_body,fields='id').execute() #실행문
+    #folder_id = folder.get('id')
+    
+    #이미지 저장
+    try :
+        driver.find_element_by_css_selector('#productDetail > div.product-detail-seemore > div').click() #상품정보 더보기 클릭
+        time.sleep(1)
+        driver.implicitly_wait(10) 
+    except :
+        pass
+
+    html = driver.page_source
+    soup = BeautifulSoup(html, 'html.parser')
+    #results = soup.select('#productDetail > div.product-detail-content-inside > div')
+    time.sleep(1)
+    driver.implicitly_wait(10) 
+    try :
+        results = soup.find_all("div", {"class" :'subType-IMAGE'}) #상품 정보 내 이미지 주소만 가져오기
+        num = 1
+        for i in results :
+            img = i.find('img')['src'] #이미지 주소 찾기
+            img_2 = img.replace("//", "https://")
+            img_3 = img_2.replace("http:https://", "https://")
+            urllib.request.urlretrieve(img_3, "C:/Users/user/raw/products/product_info/"+str(keyword)+"_detail_"+str(n)+"_"+str(num) +".png")
+            time.sleep(1)
+            product_detail_info = str(keyword)+"_detail_"+str(n)+"_"+str(num) +".png"
+            request_body = {
+            'name': product_detail_info, # 파일명 정보
+            'mimeType': 'application/vnd.google-apps.document', #문서형식(document)
+            #'parents': [folder_id] # 부모가 될 폴더의 ID. 즉 업로드할 폴더 위치
+            }
+
+            media = MediaFileUpload("C:/Users/user/raw/products/product_info/"+str(keyword)+"_detail_"+str(n)+"_"+str(num) +".png",resumable=True)
+            file = service.files().create(body=request_body,media_body=media,fields='id').execute()
+
+            num = num+1
+    except :
+        pass
+
+    time.sleep(1)
+    driver.implicitly_wait(10) 
+    
+    try :
+        results_2 = soup.find_all("div", {"class" :'subType-TEXT'}) #상품 정보 내 이미지 주소만 가져오기
+        for ar in results_2 :
+            r = ar.find_all('img')
+            num =1 
+            for i in r :
+                img = i.get('src') #img 내 src 속성 찾기
+                
+                #img = i.find('img')['src'] #이미지 주소 찾기
+                img_2 = img.replace("//", "https://")
+                img_3 = img_2.replace("http:https://", "https://")
+                urllib.request.urlretrieve(img_3, "C:/Users/user/raw/products/product_info/"+str(keyword)+"_detail_"+str(n)+"_"+str(num) +".png")
+                time.sleep(1)
+                product_detail_info = str(keyword)+"_detail_"+str(n)+"_"+str(num) +".png"
+                request_body = {
+                'name': product_detail_info, # 파일명 정보
+                'mimeType': 'application/vnd.google-apps.document', #문서형식(document)
+                #'parents': [folder_id] # 부모가 될 폴더의 ID. 즉 업로드할 폴더 위치
+                }
+
+                media = MediaFileUpload("C:/Users/user/raw/products/product_info/"+str(keyword)+"_detail_"+str(n)+"_"+str(num) +".png",resumable=True)
+                file = service.files().create(body=request_body,media_body=media,fields='id').execute()
+                num = num+1
+    except :
+        pass
+    
+    time.sleep(2)
+    driver.implicitly_wait(10)
+    
+    print(coupang_url)  #URL 확인
+    print(str(product_title))   #상품 제목 확인
+
+print("끝")
+
+driver.close()
+driver.quit()
+
+
+#####구글 드라이브 내 메모장 파일 ID 확인#####
+results = service.files().list(pageSize=100,fields="nextPageToken, files(id, name)").execute() #파일 내 아이템 긁어오기
+items = results.get('files', []) #파일명
+if not items: 
+    print('No files found.')
+else: 
+    print('Files:') 
+    for item in items: 
+        print(item) 
+        #print('{0} ({1})'.format(item['name'], item['id']))
+
+#####구글 드라이브에서 메모장 다운받기#####
+max_cnt = len(items)
+#print(max_cnt)
+
+for i in range(0, max_cnt) :
+    file_id = items[i]['id']
+    name = items[i]['name']
+    #print(file_id) 
+    request = service.files().export_media(fileId=file_id, mimeType='text/plain')
+    fb=io.FileIO('C:/Users/user/raw/products/product_info/'+str(name)+'.google.txt', 'wb')
+    downloader = MediaIoBaseDownload(fb, request)
+    done = False 
+    while done is False: 
+        try :
+            status, done = downloader.next_chunk() 
+            print('Download %d%%.' % int(status.progress() * 100))
+        except :
+            break
+print('끝')
+
+
+#####파일 하나로 합치고, 요약된 정보만 정리하여 가져오기#####
+for n in range(1 , 6) :
+    f = open('C:/Users/user/raw/products/product_info/product_'+str(n)+'.txt', 'w', encoding ='utf8') #메모장 열기
+    product_info_list = glob.glob('C:/Users/user/raw/products/product_info/product_detail_'+str(n)+'_*.google.txt') #해당 상품의 모든 텍스트 긁기
+    product_info_list_2 = []
+    for product_dir in product_info_list : #디렉토리 수정
+        product_dir = product_dir.replace("\\", "/")
+        product_info_list_2.append(product_dir)
+
+    for product_text in product_info_list_2 :
+        file = open(product_text, 'r', encoding='utf-8') #메모장 열기
+        file_text = file.readlines()
+        for file_text_text in file_text :
+            f.write(str(file_text_text)+'\n' + '\n')
+
+f.close()
+
+######상품요약 정리 #####
+for n in range(1 , 6) :
+    f = open('C:/Users/user/raw/products/product_info/product_summary_'+str(n)+'.txt', 'w', encoding='utf8')
+    file = open('C:/Users/user/raw/products/product_info/product_'+str(n)+'.txt', 'r', encoding='utf8')
+    lines = file.readlines()
+    for line in lines :
+        nline = line.split('\n')[0]
+        nline_2 = nline.replace("_", "") #정제
+        nline_3 = nline_2.replace("'", "") #정제
+        nline_4 = nline_3.replace("|", "") #정제
+        nline_num = len(nline_4) #한 줄당 단어 세기
+        if nline_num >= 15 : #한 줄당 단어 10개 이상만 넣기
+            f.write(nline_4 + '\n') #줄바꿈까지
+
+f.close()
