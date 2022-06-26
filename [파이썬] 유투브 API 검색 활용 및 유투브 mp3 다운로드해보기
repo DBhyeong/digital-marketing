@@ -1,0 +1,131 @@
+#유투브 API 관련 import 
+
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from oauth2client.tools import argparser
+
+from apiclient.discovery import build
+from apiclient.errors import HttpError
+from oauth2client.tools import argparser
+
+
+#구글 프로젝트명 Youtube API Test > API 키 발급 > 해당 API 키 발급 관련 복사
+
+#인증 내용
+
+DEVELOPER_KEY = ""  #해당 API 키 발급 관련된거 넣기
+YOUTUBE_API_SERVICE_NAME="youtube"
+YOUTUBE_API_VERSION="v3"
+
+youtube = build(YOUTUBE_API_SERVICE_NAME,YOUTUBE_API_VERSION,developerKey=DEVELOPER_KEY)
+
+#검색결과
+
+keyword = 'mbc 뉴스' #키워드입력
+
+search_response = youtube.search().list(
+    q = keyword, #키워드
+    order = "relevance",  #검색결과 정렬 ## relevance 연관성순 //  date 날짜순
+    part = "snippet", #키워드
+    maxResults = 50  #검색결과
+    ).execute()
+
+print(search_response)
+
+f =  open('C:/Users/user/raw/youtube/search_results.csv', 'w', encoding='utf-8-sig') #csv파일 데이터 넣을거 생성
+f.write("keyword,youtube_url,title_2,viewCount,likeCount,commentCount,published_date,channelId,sub,vid,views"+'\n') #컬럼명 입력
+
+
+for search_result in search_response.get("items", []):
+    try :
+        videoid = search_result['id']['videoId'] #비디오 id 
+        #print(videoid)
+    except :
+        videoid = 'BNB6PrOP-zk' #임의용
+    videos_stats = youtube.videos().list(part="snippet, contentDetails, statistics",id = videoid).execute()
+    for i in videos_stats['items'] :
+        url = i['id']
+        youtube_url = "https://www.youtube.com/watch?v=" + str(url)
+        #print(youtube_url)
+        title = i['snippet']['title'] #제목
+        title_2 = title.replace(",", "")  
+        description = i['snippet']['description'] #설명
+        channelId = i['snippet']['channelId'] #채널ID
+        viewCount = i['statistics']['viewCount'] #조회수
+        try :
+            likeCount = i['statistics']['likeCount'] #좋아요수
+        except :
+            likeCount = '0'
+        try :
+            favoriteCount = i['statistics']['favoriteCount'] #공유수
+        except :
+            favoriteCount ='0'
+        try :
+            commentCount= i['statistics']['commentCount'] #댓글수
+        except :
+            commentCount = '0'
+        publishedAt = i['snippet']['publishedAt'] #업르도 날짜
+        published_date = publishedAt[:10]
+        #print(published_date)
+        channel_stats = youtube.channels().list(part='statistics', id=channelId).execute()
+        
+        channel_url = 'https://www.youtube.com/channel/' + str(channelId)
+        
+        #print(channel_stats)
+        for channel_stats_desc in channel_stats['items'] :
+            try : 
+                sub = channel_stats_desc['statistics']['subscriberCount']  #총 팔로워 수
+            except :
+                sub = '0'
+            vid = channel_stats_desc['statistics']['videoCount']  #총 비디오 업로드수
+            views = channel_stats_desc['statistics']['viewCount'] #총 조회수
+        
+        #print(keyword)
+        f.write(str(keyword)+','+str(youtube_url)+','+str(title_2)+','+str(viewCount)+','+str(likeCount)+','+str(commentCount)+','+str(published_date) +','+ str(channel_url)+','+ str(sub)+','+str(vid)+','+str(views) + '\n')
+        
+        #print('######################### 동영상 정보 #########################')
+        #print(title_2)
+        #print(youtube_url) 
+        #print(description)
+        #print(viewCount)
+        #print(likeCount)
+        #print(commentCount)
+        #print(published_date)
+        
+        #print('######################### 채널 정보 #########################')
+        #print(sub)
+        #print(vid)
+        #print(views)
+f.close()
+
+print("완료")
+
+import youtube_dl
+from youtube_transcript_api import YouTubeTranscriptApi
+
+output_dir = os.path.join('./', '%(playlist_title)s', '%(playlist_index)s. %(title)s.%(ext)s')
+
+
+urls = [
+'https://www.youtube.com/watch?v=XeCU2tVmOpQ',
+'https://www.youtube.com/watch?v=tf58iMHxCjc'
+]
+
+try :
+    ydl_opts = { #youtube_dl 라이브러리 설정
+    'outtmpl': output_dir,
+    'format': 'bestaudio/best',  #최고 품질로 추출
+    'postprocessors': [{ 
+        'key': 'FFmpegExtractAudio', #영상을 오디오 파일로 추출
+        'preferredcodec': 'mp3', #오디오 파일 포멧을 mp3파일로 설정
+        'preferredquality': '192', #오디오 품질 설정 192k
+        }],
+    }
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl :
+        for url in urls :
+            ydl.download([url])
+except :
+    pass
+
+print("다운로드가 완료되었습니다.")
