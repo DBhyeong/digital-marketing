@@ -1,0 +1,45 @@
+#핀터레스트 비공식 API 테스트
+!pip install py3-pinterest
+
+
+#핀터레스트 비공식 API 로그인
+
+import random 
+import time
+import os
+from py3pin.Pinterest import Pinterest
+
+#핀터레스트 로그인
+pinterest = Pinterest(email='', #계정이메일
+                      password='', #계정비번
+                      username='',  #사용자이름
+                      cred_root='C:/Users/user/pinterest/') #쿠키 세션을 저장할 디렉토리 (누락시 자동생성)
+                      #cred_root='./')  #쿠키 세션을 저장할 디렉토리 (누락시 자동생성)
+pinterest.login()  #핀터레스트 로그인
+
+
+
+
+#핀터레스트 비공식 API를 통한 정보 가져오기
+
+#user_profile = pinterest.get_user_overview() #유저 프로필
+#boards  = pinterest.boards(username='username')  #모든 사용자 보드 가져오기
+#user_profile #유저프로필
+#boards #모든 사용자보드 가져오기
+
+#pins = pinterest.board_feed(board_id='board_id') #보드의 모든 핀 나열
+#pins #보드의 모든 핀 나열
+
+
+
+
+#핀터레스트 비공식 API를 통한 핀 생성하기
+
+import json
+
+pin_response = pinterest.upload_pin(board_id='board_id',
+                     image_file='C:/Users/user/raw/products/product_info/product_detail_5_6.png',
+                     description='test',
+                     title='test',
+                     link='link')
+response_data = json.loads(pin_response.content)
