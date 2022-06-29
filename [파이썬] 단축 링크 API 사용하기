@@ -1,0 +1,54 @@
+#네이버 단축링크
+
+import os
+import sys
+import urllib.request
+client_id = "" # 개발자센터에서 발급받은 Client ID 값
+client_secret = "" # 개발자센터에서 발급받은 Client Secret 값
+encText = urllib.parse.quote("https://smartstore.naver.com/terakorea/products/6627275916")
+data = "url=" + encText
+url = "https://openapi.naver.com/v1/util/shorturl"
+request = urllib.request.Request(url)
+request.add_header("X-Naver-Client-Id",client_id)
+request.add_header("X-Naver-Client-Secret",client_secret)
+response = urllib.request.urlopen(request, data=data.encode("utf-8"))
+rescode = response.getcode()
+if(rescode==200):
+    response_body = response.read()
+    print(response_body.decode('utf-8'))
+else:
+    print("Error Code:" + rescode)
+    
+
+
+
+!pip install PyShorteners #설치
+
+#tinyURL로 만들기
+
+import pyshorteners as ps
+import time
+
+link = ['yourlink'    
+]
+
+for i in link :
+    sh = ps.Shortener()
+    short_url = sh.tinyurl.short(i)
+    print(short_url)
+    time.sleep(1)
+    
+#Cuttly URL로 단축 링크 만들기
+#https://cutt.ly/ 사이트에 들어가서 API 키 발급받고 해당 api key를 하기 URL에 넣으면 됨.
+
+import requests
+
+api_key = ""
+url = 'yourlink'
+api_url = f"https://cutt.ly/api/api.php?key={api_key}&short={url}"
+data = requests.get(api_url).json()["url"]
+if data["status"] == 7:
+    shortened_url = data["shortLink"]
+    print("Shortened URL:", shortened_url)
+else:
+    print("[!] Error Shortening URL:", data)
