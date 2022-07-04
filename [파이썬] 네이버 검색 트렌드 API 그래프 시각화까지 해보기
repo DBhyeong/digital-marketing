@@ -1,0 +1,44 @@
+import os
+import sys
+import urllib.request
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+
+client_id = ""  #clientID 넣기
+client_secret = "" #clientID secret 키 넣기
+
+startDate = '2022-01-01' #시작날짜
+endDate =  '2022-07-03' #끝날짜
+timeUnit = 'date'  #주기 week, month
+groupName = '선풍기' #그룹명
+
+keyword = '선풍기' #키워드
+
+url = "https://naveropenapi.apigw.ntruss.com/datalab/v1/search"
+body = "{\"startDate\":\""+str(startDate)+"\",\"endDate\":\""+str(endDate)+"\",\"timeUnit\":\""+str(timeUnit)+"\",\"keywordGroups\":[{\"groupName\":\""+str(groupName)+"\",\"keywords\":[\""+str(keyword)+"\"]}]}"
+
+request = urllib.request.Request(url)
+request.add_header("X-NCP-APIGW-API-KEY-ID",client_id)
+request.add_header("X-NCP-APIGW-API-KEY",client_secret)
+request.add_header("Content-Type","application/json")
+response = urllib.request.urlopen(request, data=body.encode("utf-8"))
+rescode = response.getcode()
+if(rescode==200):
+    response_body = response.read()
+    #print(response_body.decode('utf-8'))
+    json_str = response_body.decode('utf-8')
+else:
+    print("Error Code:" + rescode)
+
+json_object = json.loads(json_str)  #json 파일화
+
+
+
+daily_data = pd.DataFrame(json_object['results'][0]['data'])  #데이타
+summary  = daily_data.groupby(['period']).max()[['ratio']]    #일자별 정렬
+
+
+plt.plot(list(summary.index), summary['ratio'], label='ratio') #그래프
