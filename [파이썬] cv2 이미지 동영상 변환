@@ -1,0 +1,34 @@
+import cv2
+import glob
+import numpy as np
+import re
+
+img_array = []
+numbers = re.compile(r'(\d+)')
+
+def numericalSort(value):
+    parts = numbers.split(value)
+    parts[1::2] = map(int, parts[1::2])
+    return parts
+
+for filename in sorted(glob.glob('C:/Users/user/Desktop/test/*.jpg') , key=numericalSort):
+    img = cv2.imread(filename)
+    height, width, layers = img.shape
+    size = (width,height)
+    img_array.append(img)
+    
+out = cv2.VideoWriter('C:/Users/user/Desktop/test/scenario1.mp4'  #결과물
+                      , cv2.VideoWriter_fourcc(*'H264')  #코덱 파일형식
+                      , 0.5 #프레임   0.5 = 이미지 1장당 2초, 1 = 이미지 1장당 1초, 2 = 이미지 1장당 0.5초  
+                      , size  #사이즈
+                     )
+
+#cv2.VideoWriter_fourcc(*'H264')  #디지털 비디오 콘텐츠 기록, 압축 및 배포
+#cv2.VideoWriter_fourcc(*'H265')  #라이브 스트리밍 비디오
+
+#H264 <-- 파일명이 그나마 제일 나음 H266 은 모르겟음.
+
+for i in range(len(img_array)):
+    out.write(img_array[i])
+out.release()
+cv2.destroyAllWindows()
