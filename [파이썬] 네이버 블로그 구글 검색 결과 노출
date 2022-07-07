@@ -1,0 +1,109 @@
+#네이버블로그 제목/본문 크롤링 
+
+import requests
+from    bs4      import BeautifulSoup
+
+blogId = '' #블로그ID 입력
+postId = '' #포스트ID 입력
+
+raw = requests.get("https://blog.naver.com/PostView.naver?blogId={}&logNo={}".format(blogId, postId))  #긁기
+html = BeautifulSoup(raw.text, 'html.parser') #긁기
+
+
+title = html.find("meta", property= "og:title") #제목
+#desc = html.find("meta", property= "og:description") #스니펫
+
+content_txt = []
+content_txt_2 = []
+
+title_2 = title['content'] #제목
+content = html.find("div", {"class" : "se-main-container"}).text #본문
+content_txt.append(content)
+
+
+#desc_2 = desc['content']
+#desc_2 = desc_2.replace("...", "")
+#print(desc_2) 
+
+#content_2 = content.readlines()
+
+    
+for i in content_txt :
+    nline = i.replace("\n", "")
+    nline = nline.replace("\u200b", "")
+    nline = nline.replace('↓', "") 
+    content_txt_2.append(nline)
+#print(content_txt_2) #확인
+
+content_text = str(content_txt_2)  #최종본문
+
+print("제목: " + str(title_2))  #제목확인
+print("-------------------------------------------본문----------------------------------------------")
+print(content_text[:1000]) #최종본문확인
+
+
+
+#구글 블로거 인증
+
+# 구글 블로거 API 인증 (2번 해야됨)
+
+import sys
+import os
+import pickle
+from oauth2client import client
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+
+BLOG_ID = "" #blogID 입력
+#SCOPES = ['https://www.googleapis.com/auth/blogger', 'https://www.googleapis.com/auth/drive.file']
+
+SCOPES = ['https://www.googleapis.com/auth/blogger']
+
+def get_blogger_service_obj():
+    creds = None
+    if os.path.exists('auto_token.pickle'):
+        with open('auto_token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'C:/Users/user/blogger/client_secret.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('auto_token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+    blog_service = build('blogger', 'v3', credentials=creds)
+    drive_service = build('drive', 'v3', credentials=creds)
+
+    return drive_service,blog_service
+
+drive_handler, blog_handler = get_blogger_service_obj()
+
+
+#블로거 리다이렉트 포스팅
+
+blogger_redirect_url = str(blog_url)
+blogger_title =  str(title_2)
+#print(blogger_title)
+#print(blogger_redirect_url)
+
+content = content_text[:1000]
+content += '<p>블로그로 이동중입니다.&nbsp;</p><p>잠시만 기달려주세요.</p><p><br /></p>'
+content += '<meta content="0; URL='+str(blog_url)+'" http-equiv="Refresh"></meta>'
+
+
+
+
+data = {
+'content': content,
+'title': blogger_title,
+'labels' : blogger_title,
+'blog': {
+    'id': BLOG_ID, # The identifier of the Blog that contains this Post.
+  },}
+posts = blog_handler.posts()
+res = posts.insert(blogId=BLOG_ID, body=data, isDraft=False, fetchImages=True).execute() 
+res
