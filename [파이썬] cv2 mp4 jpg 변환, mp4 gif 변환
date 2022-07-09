@@ -1,0 +1,51 @@
+# mp4 -> jpg 변환
+import cv2
+
+vidcap = cv2.VideoCapture('C:/Users/user/Desktop/videos/20211107_142010.mp4')  #비디오 경로
+success,image = vidcap.read() #비디오 읽기
+
+count = 0  #카운트
+
+while success:
+  cv2.imwrite("C:/Users/user/Desktop/videos/%06d.jpg" % count, image)     # save frame as JPEG file
+  success,image = vidcap.read() #비디오 읽기
+  print('Read a new frame: ', success) #카운트
+  if count == 200 : #200이면 멈추기
+    break
+  count += 1
+
+print("비디오 내 이미지 jpg 파일 변환 완료")
+
+
+# jpg -> gif 변환
+
+#이미지에서 gif 만들기
+
+from PIL import Image
+import glob
+
+
+# Create the frames
+frames = []
+imgs = glob.glob("C:/Users/user/Desktop/videos/img/*.jpg")  #이미지 읽기
+for i in imgs:
+    new_frame = Image.open(i)
+    frames.append(new_frame) #이미지를 프레임 리스트에 담기
+ 
+# Save into a GIF file that loops forever
+frames[0].save('C:/Users/user/Desktop/videos/result.gif', format='GIF',
+               append_images=frames[1:],  #이미지를 프레임 리스트에 담기
+               save_all=True,
+               duration=0.2, #0.2로 설정 
+               loop=0
+              )
+              
+
+#gif 를 mp4로 변환하기
+
+import moviepy.editor as mp
+
+clip = mp.VideoFileClip("C:/Users/user/Desktop/videos/result.gif")
+clip.write_videofile("C:/Users/user/Desktop/videos/result.mp4")
+#clip.write_videofile("Awesome JavaScript Text Typing Animation Example - TyperJS.avi", codec='libx264')
+clip.close()
