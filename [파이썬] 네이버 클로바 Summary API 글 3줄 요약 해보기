@@ -1,0 +1,81 @@
+product_num = 1
+
+#메모장 상품 텍스트 가져오기
+
+f = open('C:/Users/user/raw/products/product_info/product_summary_'+str(product_num)+'.txt', 'r', encoding='utf8')
+#f = open('C:/Users/user/raw/products/product_info/product_'+str(product_num)+'.txt', 'r', encoding='utf8')
+
+text = f.read()
+text_2 = text.replace("\n", "")
+text_3 = text_2.replace("________________", " ")
+#print(text_3)
+
+
+# 네이버 요약 API 
+
+client_id = ""  #클라이언트 ID
+client_secret = "" #클라이언트 시크릿 ID
+headers = {
+    "X-NCP-APIGW-API-KEY-ID": client_id,
+    "X-NCP-APIGW-API-KEY": client_secret,
+    "Content-Type": "application/json"
+}
+language = "ko" # Language of document (ko, ja )
+model = "general" # Model used for summaries (general, news)
+tone = "2" # Converts the tone of the summarized result. (0, 1, 2, 3)
+
+# 0 - 요체
+# 1 - 구어체(요체)
+# 2 - 습니다. 
+# 3 - 음슴체
+
+
+#f = open('C:/Users/user/raw/products/product_info/product_1.txt', 'r', encoding='utf8')
+#text = f.read()
+#text_2 = text.replace("\n", "")
+#text_3 = text_2.replace("________________", " ")
+
+summaryCount = "10" # This is the number of sentences for the summarized document.
+url= "https://naveropenapi.apigw.ntruss.com/text-summary/v1/summarize" 
+
+title = "상품정보요약"
+
+#content 에 붙이자. 
+
+content = text_3[1:800]
+#content = text_3[1000:2000]
+#content = text_3[2000:3000]
+#content = text_3[3000:4000]
+
+
+data = {
+    "document": {
+    "title": title,
+    "content" : content
+    },
+    "option": {
+    "language": language,
+    "model": model,
+    "tone": tone,
+    "summaryCount" : summaryCount
+    }
+}
+
+#print(json.dumps(data, indent=4, sort_keys=True))
+response = requests.post(url, data=json.dumps(data), headers=headers)
+rescode = response.status_code
+
+#if(rescode == 200):
+#    print (response.text)
+#else:
+#    print("Error : " + response.text)
+    
+summary_result = response.json()
+
+f = open('C:/Users/user/raw/result.txt', 'w', encoding='utf8')
+
+f.write(summary_result['summary'])
+
+print(summary_result['summary'])
+
+f.close()
