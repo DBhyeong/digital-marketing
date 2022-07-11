@@ -1,0 +1,43 @@
+#네이버 통합 검색 키워드 모니터링
+
+import os
+import requests
+from    bs4      import BeautifulSoup
+import time
+
+keywords = ['키워드'
+]
+
+for keyword in keywords :
+    url ='https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=' + str(keyword)
+    raw = requests.get(url)  #협찬
+    html = BeautifulSoup(raw.text, 'html.parser') #긁기
+    text = str(html)
+    if text.find("키워드") > 0 :
+        print(str(keyword) + ",O")
+    else :
+        print(str(keyword) + ", X")
+    time.sleep(1) #1초
+print("최종완료")
+
+#다음 통합 검색 키워드 모니터링
+
+import os
+import requests
+from    bs4      import BeautifulSoup
+import time
+
+keywords = ['키워드'
+]
+
+for keyword in keywords :
+    url ='https://search.daum.net/search?w=tot&DA=YZR&t__nil_searchbox=btn&sug=&sugo=&sq=&o=&q=' + str(keyword)
+    raw = requests.get(url)  #협찬
+    html = BeautifulSoup(raw.text, 'html.parser') #긁기
+    text = str(html)
+    if text.find("키워드") > 0 :
+        print(str(keyword) + ",O")
+    else :
+        print(str(keyword) + ",X")
+    time.sleep(1) #1초
+print("최종완료")
