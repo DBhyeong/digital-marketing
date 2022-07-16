@@ -1,0 +1,25 @@
+#핀터레스트 비공식 API 로그인
+
+import random 
+import time
+import os
+from py3pin.Pinterest import Pinterest
+
+#핀터레스트 로그인
+pinterest = Pinterest(email='', #계정이메일
+                      password='', #계정비번
+                      username='', #사용자이름
+                      cred_root='C:/Users/tera/Desktop/pinterest/')  #쿠키 세션을 저장할 디렉토리 (누락시 자동생성)
+pinterest.login(headless=False) #핀터레스트 로그인
+
+
+#핀터레스트 비공식 API 포스팅
+
+import json
+
+pin_response = pinterest.upload_pin(board_id='' 보드ID,
+                     image_file='C:/Users/tera/Desktop/upload/product_detail_5_2.png',
+                     description='test',
+                     title='test',
+                     link='link')
+response_data = json.loads(pin_response.content)
