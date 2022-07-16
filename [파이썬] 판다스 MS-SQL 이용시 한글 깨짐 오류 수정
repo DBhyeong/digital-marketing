@@ -1,0 +1,25 @@
+import pymssql
+import pandas as pd
+
+conn = pymssql.connect(server='localhost',  #서버명
+                       user='user',  #계정명
+                       password='password', #비번 
+                       database='mytest' ,   #DB
+                       charset='utf8',   # CP949 로 해야 한글 안 깨짐
+                       autocommit=True) 
+
+
+############## 쿼리 ##############
+naver_query ='''
+SELECT top 100 * 
+FROM mytest..[supermarket] with (nolock)
+;
+
+'''
+
+data = pd.read_sql(sql=naver_query, con=conn)
+
+conn.commit()
+conn.close()
+
+data
