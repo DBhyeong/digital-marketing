@@ -1,0 +1,28 @@
+import requests
+from    bs4      import BeautifulSoup
+import xml.etree.ElementTree as ET
+import datetime
+import time
+
+blogIds = ['' #블로그 ID 입력
+]
+for blogId in blogIds :
+    url = 'https://blog.naver.com/NVisitorgp4Ajax.nhn?blogId={}'.format(blogId) 
+
+    try :
+        raw = requests.get(url)  #협찬
+        #html = BeautifulSoup(raw.text, 'html.parser') #긁기
+        format = '%Y%m%d'
+        today = datetime.datetime.now()  #오늘날짜
+        yesterday = today - datetime.timedelta(days=+1) #어제날짜
+        str_datetime = datetime.datetime.strftime(yesterday,format) #어제날짜변환
+
+        for node in ET.fromstring(raw.text) :
+            if node.get("id") == str_datetime :
+                print(str(url) +' ,'+node.get("cnt"))   
+            else :
+                pass
+    except :
+        pass
+    
+    time.sleep(2) #2초간
