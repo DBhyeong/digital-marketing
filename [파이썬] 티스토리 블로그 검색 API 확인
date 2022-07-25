@@ -1,0 +1,59 @@
+#티스토리 검색결과 확인 (블로그기준)
+
+import requests
+import json
+
+keyword = '갤럭시Z플립3케이스'
+
+url = "https://dapi.kakao.com/v2/search/blog?&query=" + keyword
+
+queryString = {"query" : keyword }
+
+header = {'Authorization' : 'KakaoAK #api키 입력' }
+
+r = requests.get(url, headers=header, params=queryString)
+
+result = r.json()
+
+#blog_urls = []
+
+#for i in range(0, 10) :
+#    url =result['documents'][i]['url']
+#    blog_urls.append(url)
+#    print(url)
+    
+
+#
+#for i in range(0, 10) : #제목
+#    title = result['documents'][i]['title']
+#    blog_urls.append(url)
+#    print(title)
+
+
+#검색결과 내용 확인하기
+
+from datetime import datetime
+
+n = 1
+
+for i in result['documents'] :
+    blogname = i['blogname'] #블로그 네임
+    title = i['title'] #제목
+    title = title.replace("<b>", "")
+    title = title.replace("</b>", "")
+    contents = i['contents'] #내용
+    contents = contents.replace("<b>", "")
+    contents = contents.replace("</b>", "")
+    blog_date = i['datetime'] #특정 문자열만 반환
+    blog_date = blog_date[:10] #날짜만
+    format = '%Y-%m-%d'
+    datetime_results = datetime.strptime(blog_date, format).date()  #날짜만
+    url = i['url'] #url
+    print(str(n) + ',' + title +',' + blogname)
+    print('-----------------------------------------------')
+    print(str(n) +',' + contents)
+    print('-----------------------------------------------')
+    print(str(url))
+    print('-----------------------------------------------')
+    n +=1
+print(datetime_results)
