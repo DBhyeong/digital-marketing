@@ -1,0 +1,33 @@
+import requests
+from bs4 import BeautifulSoup
+
+f =  open('C:/Users/user/raw/starcraft_stats.csv', 'w')
+f.write("승자,승자종족,패자,패자종족,맵,리그,상세,날짜"+'\n')
+
+for n in range(1, 1488) :
+    raw = requests.get("https://ygosu.com/reports/?m2=result&s_type=oneonone&s_type2=all&search=&searcht=&page=" + str(n))  #와이고수 게시판
+    html = BeautifulSoup(raw.text, 'html.parser')
+    results = html.select('#contain > div.content_wrap2 > table > tbody > tr')
+    for ar in results :
+        win = ar.find("td", {"class" : "win"}).text #승자
+        win_2 = win.replace("(", "") #괄호 제거
+        win_3 = win_2.replace(")", "") #괄호 제거
+        win_4 = win_3.replace("Z", ",저그") #저그로 바꾸기
+        win_5 = win_4.replace("T", ",테란") #테란로 바꾸기
+        win_6 = win_5.replace("P", ",프로토스") #프로토스로 바꾸기
+        lose = ar.find("td", {"class" : "lose"}).text #패자
+        lose_2 = lose.replace("(", "") #괄호 제거
+        lose_3 = lose_2.replace(")", "") #괄호 제거
+        lose_4 = lose_3.replace("Z", ",저그") #저그로 바꾸기
+        lose_5 = lose_4.replace("T", ",테란") #테란로 바꾸기
+        lose_6 = lose_5.replace("P", ",프로토스") #프로토스로 바꾸기
+        map = ar.find("td", {"class" : "map"}).text #맵
+        map_2 = map.replace(",", "")  #쉼표 제거
+        league = ar.find("td", {"class" : "lg"}).text #리그
+        league_2 = league.replace(",", "") #쉼표 제거
+        det = ar.find("td", {"class" : "det"}).text #상세
+        det_2 = det.replace(",", "") #쉼표 제거
+        date = ar.find("td", {"class" : "date"}).text #날짜
+        f.write(win_6 +',' + lose_6 +',' + map_2 +',' + league_2 +',' + det_2 +',' + date + '\n') 
+
+f.close()
