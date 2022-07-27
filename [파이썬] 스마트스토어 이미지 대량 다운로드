@@ -1,0 +1,14 @@
+import  urllib.request
+
+f = open ('C:/Users/user/raw/products/img_2/img_url.txt', 'r', encoding='utf-8')
+
+
+url = f.readlines()
+
+n= 1
+
+for i in url :
+    urllib.request.urlretrieve(i, "C:/Users/user/raw/products/img_2/"+str(n)+".jpg")   #png 아닌 jpg 파일로 저장
+    n = n+1
+
+print("리뷰사진 다운로드 완료되었습니다.")
