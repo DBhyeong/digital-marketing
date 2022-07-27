@@ -1,0 +1,58 @@
+import requests
+from bs4 import BeautifulSoup
+import json
+
+#네이버 쇼핑 자동완성어 추출
+
+search_keyword = '갤럭시워치4'  
+
+url = 'https://shopping.naver.com/api/modules/gnb/auto-complete?keyword=' + search_keyword
+headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+            'Accept-Encoding': 'gzip'
+}
+
+response = requests.get(url, headers=headers)
+json_str = response.text
+keywords = json.loads(json_str)
+
+for kw in keywords['items'][1] : 
+    related_keywords = kw[0][0]
+    print(related_keywords)
+    
+    
+#네이버 쇼핑 연관검색어 추출
+
+shop_rel_url = 'https://msearch.shopping.naver.com/search/all?query=' + search_keyword
+
+headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+            'Accept-Encoding': 'gzip'
+}  
+
+shop_rel_response = requests.get(shop_rel_url, headers=headers)
+shop_rel_soup = BeautifulSoup(shop_rel_response.text, 'html.parser')
+shop_rel_words = shop_rel_soup.select('div.relatedTag_scroll_area__37Cda > ul > li')
+#print('\nshop_rel_keywords:', len(shop_rel_words))
+
+if len(shop_rel_words):
+    for li in shop_rel_words:
+        print(li.text)
+        
+#네이버 쇼핑 추천키워드 추출
+
+shop_recom_url = 'https://search.shopping.naver.com/search/all?query={}&cat_id=&frm=NVSHATC#'.format(search_keyword)
+
+headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+            'Accept-Encoding': 'gzip'
+}  
+
+shop_rel_response = requests.get(shop_rel_url, headers=headers)
+shop_rel_soup = BeautifulSoup(shop_rel_response.text, 'html.parser')
+shop_rel_words = shop_rel_soup.select('div.relatedTag_scroll_area__37Cda > ul > li')
+#print('\nshop_rel_keywords:', len(shop_rel_words))
+
+if len(shop_rel_words):
+    for li in shop_rel_words:
+        print(li.text)
