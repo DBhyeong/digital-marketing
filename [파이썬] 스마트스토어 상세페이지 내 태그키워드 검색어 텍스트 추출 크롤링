@@ -1,0 +1,35 @@
+import requests
+from bs4 import BeautifulSoup
+import time
+import random
+
+keyword='갤럭시워치4투명스트랩'
+
+url = 'https://search.shopping.naver.com/search/all?query={}&frm=NVSHATC'.format(keyword)
+response = requests.get(url)
+soup = BeautifulSoup(response.text, 'html.parser')
+lis = soup.find('ul', class_='list_basis').find_all('li')
+
+nshop_cnt = 1
+for li in lis:
+    try:
+        div_title = li.find('div', class_='basicList_title__3P9Q7')  # 상품명
+        title = div_title.text.strip()
+        print(f'\nshop_cnt: {nshop_cnt}\n상품 제목:{title}')
+        nshop_cnt += 1
+
+        # 쇼핑몰 등급 (파워, 빅파워, 프리미엄)
+        div_grade = li.find('span', class_='basicList_grade__LMHXE').text
+
+        ## 상세페이지 태그 추출
+        if div_grade in ('파워', '빅파워', '프리미엄'):
+            a_tag = div_title.find('a') # 상품 상세페이지 링크
+            response = requests.get(a_tag['href'])
+            time.sleep(random.uniform(0.2, 0.7))
+            soup = BeautifulSoup(response.text, 'html.parser')
+            # 태그 추출 위해 <meta> 태그 스크래핑 
+            metas = soup.find('meta', {'name':'keywords'}).get('content').split('/')[0].split(',')[:-1]
+            print(f'상세페이지 태그:\n{metas}')
+            time.sleep(3)
+    except:
+        pass           
