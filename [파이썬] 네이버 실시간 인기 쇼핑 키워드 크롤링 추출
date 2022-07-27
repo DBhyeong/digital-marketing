@@ -1,0 +1,27 @@
+import requests
+from    bs4      import BeautifulSoup
+import json 
+
+
+url = ' https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=ALL&categoryDemo=A00&categoryRootCategoryId=ALL&chartRank=1&period=P1D'
+
+headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+            'Accept-Encoding': 'gzip'
+}
+
+raw = requests.get(url=url, headers=headers)
+
+html = BeautifulSoup(raw.text, 'html.parser')
+
+#HTML 에 포함된 Javascript 태그의 json 크롤링
+test =html.find('script', {'id' : '__NEXT_DATA__'}).text #텍스트만
+
+dict_result = json.loads(test) # json으로 변환
+
+popular_kws = dict_result['props']['pageProps']['dehydratedState']['queries'][2]['state']['data']['charts']
+
+for popular_kw in popular_kws :
+    rank = popular_kw['rank'] #순위
+    real_kw = popular_kw['exposeKeyword'] #키워드
+    print(str(rank) + '순위 키워드 : ' + str(real_kw))
