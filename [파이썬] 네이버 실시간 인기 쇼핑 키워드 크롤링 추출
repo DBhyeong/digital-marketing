@@ -2,18 +2,38 @@ import requests
 from    bs4      import BeautifulSoup
 import json 
 
+"""
+age_gender
+A00 #전체
+M01 #10대 남성
+M02 #20대 남성
+M03 #30대 남성
+M04 #40대 남성
+M05 #50대 남성
+F01 #10대 여성
+F02 #20대 여성
+F03 #30대 여성
+F04 #40대 여성
+F05 #50대 여성
 
-url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=ALL&categoryDemo=M05&categoryRootCategoryId=ALL&chartRank=1&period=P1D' #전체
-#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000000&categoryDemo=M05&categoryRootCategoryId=50000000&chartRank=1&period=P1D' #패션의류
-#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000001&categoryDemo=M05&categoryRootCategoryId=50000001&chartRank=1&period=P1D' #패션잡화
-#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000002&categoryDemo=M05&categoryRootCategoryId=50000002&chartRank=1&period=P1D'  #화장품미용
-#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000003&categoryDemo=M05&categoryRootCategoryId=50000003&chartRank=1&period=P1D'  #디지털가전
-#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000004&categoryDemo=M05&categoryRootCategoryId=50000004&chartRank=1&period=P1D'  #가구인테리어
-#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000005&categoryDemo=M05&categoryRootCategoryId=50000005&chartRank=1&period=P1D'  #출산육아
-#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000006&categoryDemo=M05&categoryRootCategoryId=50000006&chartRank=1&period=P1D'  #식품
-#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000007&categoryDemo=M05&categoryRootCategoryId=50000007&chartRank=1&period=P1D'  #스포츠레저
-#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000008&categoryDemo=M05&categoryRootCategoryId=50000008&chartRank=1&period=P1D'  #생활건강
-#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000009&categoryDemo=M05&categoryRootCategoryId=50000009&chartRank=1&period=P1D'  #여가생활편의
+categoryCategoryId
+ALL  #전체
+50000000 #패션의류
+50000001 #패션잡화
+50000002 #화장품미용
+50000003 #디지털가전
+50000004 #가구인테리어
+50000005 #출산육아
+50000006 #식품
+50000007 #스포츠레저
+50000008 #생활건강
+50000009 #여가생활편의
+
+"""
+category_id ='ALL'
+age_gender = 'A00' #연령대별
+
+url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId={}&categoryDemo={}&categoryRootCategoryId=ALL&chartRank=1&period=P1D'.format(category_id,age_gender) 
 
 headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
