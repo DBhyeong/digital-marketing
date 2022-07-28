@@ -24,7 +24,7 @@ try :
 
 except :
     pass
-    time.sleep(1)    
+time.sleep(1)    
 
 #네이버 쇼핑 연관검색어 추출
 
