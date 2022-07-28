@@ -1,10 +1,11 @@
 import requests
 from    bs4      import BeautifulSoup
 import json 
+import time
 
 ############################## 네이버 ##############################
 
-keyword='갤럭시워치 투명 스트랩'
+keyword='크룩스'
 
 try :
     url = 'https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&query={}'.format(keyword) 
@@ -27,6 +28,9 @@ try :
 except :
     print(str(keyword) +"의 네이버 연관검색어가 없습니다.")
     
+    
+time.sleep(1)
+
 ############################## 카카오 자동완성 (PC) ##############################
 
 try :
@@ -48,7 +52,7 @@ try :
 except :
     print(str(keyword) +"의 카카오 PC 자동완성 연관검색어가 없습니다.")
     
-    
+time.sleep(1)
 ############################## 카카오 자동완성 (모바일) ##############################
 
 try :
@@ -70,7 +74,7 @@ try :
 except :
     print(str(keyword) +"의 카카오 모바일 자동완성 연관검색어가 없습니다.")
 
-
+time.sleep(1)
 ############################## 카카오 제안검색어 ##############################
 
 try :
@@ -94,3 +98,5 @@ try :
         print(i.text)
 except :
     print(str(keyword) +"의 카카오 제안검색어가 없습니다.")
+
+time.sleep(1)
