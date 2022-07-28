@@ -1,0 +1,96 @@
+import requests
+from    bs4      import BeautifulSoup
+import json 
+
+############################## 네이버 ##############################
+
+keyword='갤럭시워치 투명 스트랩'
+
+try :
+    url = 'https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&query={}'.format(keyword) 
+
+    headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+                'Accept-Encoding': 'gzip'
+    }
+
+    raw = requests.get(url=url, headers=headers)
+    html = BeautifulSoup(raw.text, 'html.parser')
+    test =html.find_all('div', {'class' : 'tit'}) #텍스트만
+    print("=========================네이버 제안검색어 =========================")
+    for i in test :
+        related_kw = i.text
+        related_kw = related_kw.replace("\t", "")
+        related_kw = related_kw.replace("\n", "")
+        related_kw = related_kw.replace(" ", "")
+        print(related_kw)
+except :
+    print(str(keyword) +"의 네이버 연관검색어가 없습니다.")
+    
+############################## 카카오 자동완성 (PC) ##############################
+
+try :
+    url = 'https://suggest.search.daum.net/sushi/pc/get?&q={}'.format(keyword)  #PC
+
+    headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+                'Accept-Encoding': 'gzip'
+    }
+
+
+    raw = requests.get(url=url, headers=headers)
+    html = BeautifulSoup(raw.text, 'html.parser')
+
+    suggest_kws = json.loads(html.text)
+    print("=========================카카오 자동완성 (PC) 검색어=========================")
+    for i in suggest_kws['subkeys'] :
+        print(i)
+except :
+    print(str(keyword) +"의 카카오 PC 자동완성 연관검색어가 없습니다.")
+    
+    
+############################## 카카오 자동완성 (모바일) ##############################
+
+try :
+    url = 'https://suggest.search.daum.net/sushi/mobile/get?&q={}'.format(keyword)   #모바일
+
+    headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+                'Accept-Encoding': 'gzip'
+    }
+
+
+    raw = requests.get(url=url, headers=headers)
+    html = BeautifulSoup(raw.text, 'html.parser')
+
+    suggest_kws = json.loads(html.text)
+    print("=========================카카오 자동완성 (모바일) 검색어=========================")
+    for i in suggest_kws['subkeys'] :
+        print(i)
+except :
+    print(str(keyword) +"의 카카오 모바일 자동완성 연관검색어가 없습니다.")
+
+
+############################## 카카오 제안검색어 ##############################
+
+try :
+    url = 'https://search.daum.net/search?w=tot&DA=YZR&t__nil_searchbox=btn&sug=&sugo=&sq=&o=&q={}'.format(keyword) 
+
+    headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+                'Accept-Encoding': 'gzip'
+    }
+
+
+    raw = requests.get(url=url, headers=headers)
+    html = BeautifulSoup(raw.text, 'html.parser')
+
+    recommended_kws = []
+
+    kws_lists = html.find_all('span', {'class' : 'wsn'})
+
+    print("=========================카카오 제안검색어 =========================")
+    for i in kws_lists :
+        print(i.text)
+except :
+    print(str(keyword) +"의 카카오 제안검색어가 없습니다.")
