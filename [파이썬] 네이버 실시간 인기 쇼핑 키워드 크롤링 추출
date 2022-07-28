@@ -3,7 +3,17 @@ from    bs4      import BeautifulSoup
 import json 
 
 
-url = ' https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=ALL&categoryDemo=A00&categoryRootCategoryId=ALL&chartRank=1&period=P1D'
+url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=ALL&categoryDemo=M05&categoryRootCategoryId=ALL&chartRank=1&period=P1D' #전체
+#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000000&categoryDemo=M05&categoryRootCategoryId=50000000&chartRank=1&period=P1D' #패션의류
+#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000001&categoryDemo=M05&categoryRootCategoryId=50000001&chartRank=1&period=P1D' #패션잡화
+#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000002&categoryDemo=M05&categoryRootCategoryId=50000002&chartRank=1&period=P1D'  #화장품미용
+#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000003&categoryDemo=M05&categoryRootCategoryId=50000003&chartRank=1&period=P1D'  #디지털가전
+#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000004&categoryDemo=M05&categoryRootCategoryId=50000004&chartRank=1&period=P1D'  #가구인테리어
+#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000005&categoryDemo=M05&categoryRootCategoryId=50000005&chartRank=1&period=P1D'  #출산육아
+#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000006&categoryDemo=M05&categoryRootCategoryId=50000006&chartRank=1&period=P1D'  #식품
+#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000007&categoryDemo=M05&categoryRootCategoryId=50000007&chartRank=1&period=P1D'  #스포츠레저
+#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000008&categoryDemo=M05&categoryRootCategoryId=50000008&chartRank=1&period=P1D'  #생활건강
+#url = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId=50000009&categoryDemo=M05&categoryRootCategoryId=50000009&chartRank=1&period=P1D'  #여가생활편의
 
 headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
