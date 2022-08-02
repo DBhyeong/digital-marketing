@@ -1,0 +1,13 @@
+import time
+from datetime import timedelta
+    
+    
+print("1")
+start = time.process_time()   
+print("1")
+
+
+print("2")
+end = time.process_time()
+print("Time elapsed: ", end - start)  # seconds
+print("Time elapsed: ", timedelta(seconds=end-start))
