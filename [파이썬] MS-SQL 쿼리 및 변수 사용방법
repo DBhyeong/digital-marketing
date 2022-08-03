@@ -1,0 +1,37 @@
+import pymssql
+import pandas as pd
+import time
+import datetime
+
+today = datetime.datetime.now()
+today_date = today.strftime("%Y-%m-%d")
+
+today_date = '\''+today_date+'\''  #변수명 넣을시 쉼표 넣어줘야됨
+
+conn = pymssql.connect(server='localhost'
+                       ,user='' #계정명
+                       ,password='' #비번
+                       ,database=''  #db명
+                       ,charset='utf8'
+                       ,autocommit=True)
+
+naver_query = '''
+
+select   * 
+from     mytest..naver_top500 with (nolock)
+where
+         date = '''+today_date+'''  --- 변수명을 넣을때는 꼭 기억해두기
+
+'''
+
+data = pd.read_sql(sql=naver_query, con=conn)
+
+conn.commit()
+conn.close()
+
+
+data['SVs'] = data['SVs'].str.replace("\r", "")  #필터링
+data['SVs'] = data['SVs'].astype('int') #정수로 타입변경
+
+
+data.sort_values(by=['SVs'], ascending=False) #검색량 내림차순
