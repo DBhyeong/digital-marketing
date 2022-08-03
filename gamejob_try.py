@@ -111,7 +111,7 @@ f.close()
 
 # 데이터 쌓기
 
-conn = pymssql.connect(server='localhost', user='pyuser', password='Dnflskfk12!', database='mytest' , charset='utf8')
+conn = pymssql.connect(server='localhost', user='', password='', database='' , charset='utf8')
 
 gamejob_query = '''
 
