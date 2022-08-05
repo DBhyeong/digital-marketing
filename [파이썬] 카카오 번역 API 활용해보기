@@ -1,0 +1,5 @@
+from kakaotrans import Translator
+
+translator = Translator()
+
+translator.translate("나가 뒤져부러", src='kr', tgt='en')
