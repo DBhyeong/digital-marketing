@@ -1,0 +1,19 @@
+#모든 파일 폴더 리스트 출력
+
+dir_path  ='C:/Users/user/raw/products/img_2'
+
+file_names = []
+
+file_names = os.listdir(dir_path) #이전 파일명 리스트에 담기
+
+i = 1
+
+for name in file_names :
+    src = os.path.join(dir_path, name) #디렉토리 경로
+    dst = '이미지_'+str(i) + '.jpg' #순서대로 이미지 변경
+    dst = os.path.join(dir_path, dst)
+    os.rename(src, dst)
+    i +=1
+
+    
+print("완료")
