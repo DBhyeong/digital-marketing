@@ -1,0 +1,67 @@
+#유투브 자막 다운로드
+
+import youtube_dl
+from youtube_transcript_api import YouTubeTranscriptApi
+
+output_dir = os.path.join('./', '%(playlist_title)s', '%(playlist_index)s. %(title)s.%(ext)s')
+
+# 플레이리스트 링크
+download_list = ['https://www.youtube.com/watch?v=P5EzsnKRRY0']
+
+ydl_opt = {
+'outtmpl': output_dir,
+    #'format': 'bestaudio/best',
+}
+
+with youtube_dl.YoutubeDL(ydl_opt) as ydl:
+    ydl.download(download_list) #유투브 다운로드
+
+srt = YouTubeTranscriptApi.get_transcript("P5EzsnKRRY0", languages=['ko'])
+
+with open("C:/Users/user/NA/subtitle.txt", 'w', encoding='utf-8') as f :  #유투브 영상 자막 다운
+    for i in srt :
+        #f.write("{}\n".format(i))
+        f.write(str(i) + '\n') #자막 다운
+        
+        
+for i in srt : #텍스트 확인
+    print(i['text']) #확인
+    
+    
+    
+   
+   
+#유투브 mp3 다운로드
+
+import youtube_dl
+from youtube_transcript_api import YouTubeTranscriptApi
+
+import pdfkit
+from PyPDF2 import PdfFileReader, PdfFileWriter
+from tika import parser
+import pdfkit
+
+output_dir = os.path.join('./', '%(playlist_title)s', '%(playlist_index)s. %(title)s.%(ext)s')
+
+
+urls = [''
+]
+
+try :
+    ydl_opts = { #youtube_dl 라이브러리 설정
+    'outtmpl': output_dir,
+    'format': 'bestaudio/best',  #최고 품질로 추출
+    'postprocessors': [{ 
+        'key': 'FFmpegExtractAudio', #영상을 오디오 파일로 추출
+        'preferredcodec': 'mp3', #오디오 파일 포멧을 mp3파일로 설정
+        'preferredquality': '192', #오디오 품질 설정 192k
+        }],
+    }
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl :
+        for url in urls :
+            ydl.download([url])
+except :
+    pass
+
+print("다운로드가 완료되었습니다.")
