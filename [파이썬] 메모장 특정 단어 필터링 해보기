@@ -1,0 +1,30 @@
+f = open ('C:/Users/user/Desktop/recording.txt', 'r', encoding='utf-8')
+
+
+text = f.read()
+
+text = text.replace("약간 ", "")
+text = text.replace("좀 ", "")
+text = text.replace("좀", "")
+text = text.replace("이제 ", "")
+text = text.replace("매우 ", "")
+text = text.replace("보통 ", "")
+text = text.replace("물론 ", "")
+text = text.replace("또 ", "")
+text = text.replace("굉장히 ", "")
+text = text.replace("아마 ", "")
+text = text.replace("그냥 ", "")
+text = text.replace("조금 ", "")
+text = text.replace("그 ", "")
+text = text.replace("정말 ", "")
+text = text.replace("그래서 ", "")
+text = text.replace("그러니까 ", "")
+text = text.replace("이게 뭐냐면은 ", "")
+text = text.replace("진짜 ", "")
+text = text.replace("이제 ", "")
+text = text.replace("무슨 말이냐면 ", "")
+text = text.replace("그냥 ", "")
+text = text.replace("이게 ", "")
+
+
+print(text)ㅍ
