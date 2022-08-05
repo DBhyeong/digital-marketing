@@ -1,0 +1,29 @@
+
+######################### 크롬 드라이버 최신 버전 #########################
+#하기 형식대로 크롬 드라이버 불러야함
+
+warnings.filterwarnings('ignore')
+
+try:
+    shutil.rmtree(r"c:\chrometemp")  #쿠키 / 캐쉬파일 삭제
+except FileNotFoundError:
+    pass
+subprocess.Popen(r'C:\Program Files\Google\Chrome\Application\chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\chrometemp"') # 디버거 크롬 구동
+option = Options()
+option.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+chrome_ver = chromedriver_autoinstaller.get_chrome_version().split('.')[0]
+try:
+    s = Service(f'./{chrome_ver}/chromedriver.exe')
+    driver = webdriver.Chrome(service=s, options=option)
+    #driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe', options=option)
+except:
+    chromedriver_autoinstaller.install(True)
+    s = Service(f'./{chrome_ver}/chromedriver.exe')
+    driver = webdriver.Chrome(service=s, options=option)
+    #driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe', options=option)
+    #driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe', options=option)
+driver.maximize_window() #최대창
+time.sleep(3)    
+driver.implicitly_wait(10)
+
+action = ActionChains(driver) #액션지정
