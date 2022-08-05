@@ -1,0 +1,113 @@
+#인스타그램 로그인
+
+from instagrapi import Client
+from instagrapi.types import StoryMention, StoryMedia, StoryLink, StoryHashtag
+
+from instagrapi import Client
+from instagrapi.types import StoryMention, StoryMedia, StoryLink, StoryHashtag
+
+cl = Client()
+cl.login('username', 
+		'password') #유저계정, 비밀번호
+    
+
+
+#인스타그램 해시태그 
+
+#해시태그 관련 정보 가져오기
+
+hash_keyword = '갤럭시워치4스트랩'
+
+#hashtag  = cl.hashtag_info(hash_keyword) #해시태그 건수  
+
+#time.sleep(3)
+#print(str(hashtag) +" 건수 정보 완료")
+
+#hashtag_related_hashtags = cl.hashtag_related_hashtags(hash_keyword) #연관 해시태그 검색어 리스트
+
+#hashtag_medias_top = cl.hashtag_medias_top(name=hash_keyword, amount = 2) #인기 게시물 정보(top 10)
+
+#hashtag_medias_top = cl.hashtag_medias_top(name=hash_keyword, amount = 9) #인기 게시물 정보(top 10) 모바일기준
+
+
+#hashtag_medias_top_1 = cl.hashtag_medias_v1(name= hash_keyword, amount = 27, tab_key = "top") #인기게시물(모바일기준)
+hashtag_medias_top_1 = cl.hashtag_medias_v1(name= hash_keyword, amount = 27, tab_key = "recent") #최신게시물(모바일기준)
+
+time.sleep(3)
+#print("인기게시물 건수 정보 완료")
+
+#hashtag_medias_top[0].dict() #결과값 보기
+
+#hashtag_medias_recent = cl.hashtag_medias_recent(name=hash_keyword, amount=10) #최근게시물 정보 (30개)
+#time.sleep(3)
+print("최근게시물 건수 정보 완료")
+
+#hashtag.dict()
+
+
+f =  open('C:/Users/user/raw/instagram_info/hashtag_medias_top_results.csv', 'w', encoding='utf-8-sig') #csv파일 데이터 넣을거 생성
+f.write("hashtags,instagram_url,username,insgta_followers,post_url,like_counts,comment_counts,user_info_biography_2"+'\n') #컬럼명 입력
+
+
+#인스타그램 인기게시물 기준
+
+for i in range(0, len(hashtag_medias_top_1)) : 
+    text = hashtag_medias_top_1[i].dict()
+    user = text['user']['username'] #계정명
+    user_url = "https://www.instagram.com/" + str(user)  #해당 인기 게시물 인스타 계정명
+    product = text['code'] #제품상세
+    product_url = "https://www.instagram.com/p/" + str(product) #인기 게시물 상세 페이지
+    comment_count = text['comment_count'] #댓글수
+    like_count = text['like_count'] #좋아요수
+    caption_text = text['caption_text'] #본문말 (해시태그 등)
+    #print(caption_text)
+    #유저정보
+    user_info= cl.user_info_by_username(user) #튜플형태임
+    time.sleep(3) #3초간격
+    user_info_text = user_info.dict()
+    user_info_media_count = user_info_text['media_count'] #게시물수
+    user_info_follower_count = user_info_text['follower_count'] #팔로워수
+    user_info_biography = user_info_text['biography'] #내용
+    user_info_biography_2 = user_info_biography.replace(",", "") #필터링
+    user_info_biography_2 = user_info_biography_2.replace("\n" ,"") #필터링
+    #print(str(caption_text)) #본문 내용
+    #print("----------------------------------------------------------------------------")
+    f.write(str(hash_keyword)+','+str(user_url)+','+str(user)+','+str(user_info_follower_count)+','+str(product_url)+','+str(like_count)+','+str(comment_count)+','+str(user_info_biography_2)+'\n')
+print(str(hashtag) +" 의 키워드의 처리 완료")
+
+f.close()
+
+
+
+#인스타그램 최근게시물 top 100 기준
+
+f =  open('C:/Users/user/raw/instagram_info/hashtag_medias_recent.csv', 'w', encoding='utf-8-sig') #csv파일 데이터 넣을거 생성
+f.write("hashtags,instagram_url,username,insgta_followers,post_url,like_counts,comment_counts,user_info_biography_2"+'\n') #컬럼명 입력
+
+
+for i in range(0, 26) : #Top 100
+    text = hashtag_medias_top_1[i].dict()
+    user = text['user']['username'] #계정명
+    user_url = "https://www.instagram.com/" + str(user)  #해당 인기 게시물 인스타 계정명
+    product = text['code'] #제품상세
+    product_url = "https://www.instagram.com/p/" + str(product) #인기 게시물 상세 페이지
+    comment_count = text['comment_count'] #댓글수
+    like_count = text['like_count'] #좋아요수
+    caption_text = text['caption_text'] #본문말 (해시태그 등)
+    #print(product_url)
+    
+    #유저정보
+    user_info= cl.user_info_by_username(user) #튜플형태임
+    time.sleep(3) #3초간격
+    user_info_text = user_info.dict()
+    user_info_media_count = user_info_text['media_count'] #게시물수
+    user_info_follower_count = user_info_text['follower_count'] #팔로워수
+    user_info_biography = user_info_text['biography'] #내용
+    user_info_biography_2 = user_info_biography.replace(",", "") #필터링
+    user_info_biography_2 = user_info_biography_2.replace("\n" ,"") #필터링
+    f.write(str(hash_keyword)+','+str(user_url)+','+str(user)+','+str(user_info_follower_count)+','+str(product_url)+','+str(like_count)+','+str(comment_count)+','+str(user_info_biography_2)   +'\n')
+print(str(hashtag) +" 의 키워드의 처리 완료")
+
+f.close()
+
+
