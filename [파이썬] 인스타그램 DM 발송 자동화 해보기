@@ -1,0 +1,30 @@
+from instagrapi import Client
+from instagrapi.types import StoryMention, StoryMedia, StoryLink, StoryHashtag
+
+cl = Client()
+cl.login('계정명', 'password')  #id, password 넣기
+
+insta_ids = [
+'계정명'
+]  
+
+#계정 리스트 넣기
+
+for id in insta_ids :
+    try:
+        user_id = cl.user_id_from_username(id)
+
+        # user_info_pk['pk']  #pk 정보 가져오기 #3949757665
+        # user_info_pk['username'] #계정명
+
+        text = '안녕하세요 테스트입니다.' + '\n'  #메시지
+
+        cl.direct_send(text, user_ids=[user_id]) #보내기
+
+        print(str(id) + " 계정에게 인스타 DM 발송이 완료되었습니다.")
+    except :
+        print(str(id) + " 계정에게 인스타 DM 발송이 전송하지 못했습니다.")
+    
+    time.sleep(60) #1분 간격
+
+print("최종 DM 발송이 완료되었습니다.")
