@@ -1,0 +1,106 @@
+import requests
+import pandas as pd
+
+#API 설명서
+#http://www.kobis.or.kr/kobisopenapi/homepg/apiservice/searchServiceInfo.do
+
+#일간 박스오피스
+
+key = '' #발급키
+targetDt = '20220810'
+
+url = 'http://kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key={}&targetDt={}'.format(key, targetDt)
+
+response = requests.get(url)
+r_data =	 response.json()
+dailyBoxOfficeList = pd.DataFrame(r_data['boxOfficeResult']['dailyBoxOfficeList'])  
+#dailyBoxOfficeList
+
+import requests
+import pandas as pd
+
+#주간/주말 박스오피스 API 서비스
+
+key = '' #발급키
+targetDt = '20220802'
+weekGb = 1
+#“0” : 주간 (월~일) #“1” : 주말 (금~일) (default) #“2” : 주중 (월~목)
+
+url = 'http://kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json?key={}&targetDt={}&weekGb={}'.format(key, targetDt, weekGb)
+
+response = requests.get(url)
+r_data = response.json()
+weeklyBoxOfficeList = pd.DataFrame(r_data['boxOfficeResult']['weeklyBoxOfficeList'])  
+#weeklyBoxOfficeList
+
+
+
+
+import requests
+import pandas as pd
+
+#영화목록 조회 API 서비스
+
+key = '' #발급키
+
+url ='http://kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json?key={}'.format(key)
+
+response = requests.get(url)
+r_data = response.json()
+movieList = pd.DataFrame(r_data['movieListResult']['movieList'])
+#movieList
+
+import requests
+import pandas as pd
+
+#영화상세정보 조회 API
+
+key = '' #발급키
+movieCd= '20196410'
+
+url = 'http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json?key={}&movieCd={}'.format(key, movieCd)
+
+response = requests.get(url)
+r_data = response.json()
+movieInfoResult = pd.DataFrame(r_data['movieInfoResult'])
+movieInfoResult_actor = pd.DataFrame(r_data['movieInfoResult']['movieInfo']['actors']) #배우
+movieInfoResult_companys = pd.DataFrame(r_data['movieInfoResult']['movieInfo']['companys']) #회사
+movieInfoResult_directors = pd.DataFrame(r_data['movieInfoResult']['movieInfo']['directors']) #감독
+movieInfoResult_staffs = pd.DataFrame(r_data['movieInfoResult']['movieInfo']['staffs']) #스태프
+
+#movieInfoResult_actors = pd.DataFrame(r_data['movieInfoResult']['actors'])
+
+import requests
+import pandas as pd
+
+#영화인목록 조회 API
+
+key = '' #발급키	
+peopleNm = '강동원'
+
+url = 'http://kobis.or.kr/kobisopenapi/webservice/rest/people/searchPeopleList.json?key={}&peopleNm={}'.format(key, peopleNm)
+
+response = requests.get(url)
+r_data = response.json()
+peopleListResult = pd.DataFrame(r_data['peopleListResult']['peopleList'])
+peopleListResult
+
+
+
+import requests
+import pandas as pd
+
+#영화인목록 조회 상세 API
+
+key = '' #발급키
+peopleCd ='10000558'
+
+url = 'http://kobis.or.kr/kobisopenapi/webservice/rest/people/searchPeopleInfo.json?key={}&peopleCd={}'.format(key, peopleCd)
+response = requests.get(url)
+r_data = response.json()
+
+peopleInfoResult = pd.DataFrame(r_data['peopleInfoResult']) #사람
+peopleInfo_filmos = pd.DataFrame(r_data['peopleInfoResult']['peopleInfo']['filmos']) #영화
+
+
+
