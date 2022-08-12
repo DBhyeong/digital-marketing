@@ -1,0 +1,7 @@
+results = html.select("tr", {"class" : ""})
+for ar in results :
+    try :  #제목
+        title = ar.find("a", {"class" : "subject-link"})  #타이틀 가져오기
+        title_2 = title.span.extract() #span 태그 제거
+        title_3 = title.get_text().strip() #공백 및 텍스트만 추출
+        title_4 = title_3.replace(",", "") #쉼표제거
