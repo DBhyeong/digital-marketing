@@ -1,0 +1,91 @@
+import os
+from PIL import Image, ImageFont, ImageDraw
+from IPython.display import display
+
+directory = 'C:/Users/user/Desktop/test/image/' #디렉토리
+
+keywords = ['장풍운전',
+'소현성록',
+'위경천전',
+'온달전',
+'남정팔난기',
+'용문전',
+'화왕전',
+'김진옥전',
+'신화동명왕신화',
+'금우태자전',
+'용궁부연록',
+'정을선전',
+'해동명장김유신실기',
+'심생전',
+'국순전',
+'콩쥐팥쥐전',
+'춘향전',
+'이생규장전',
+'이규보 경설',
+'옥루몽',
+'도미설화',
+'낙성비룡',
+'바리데기 설화',
+'정진사전',
+'지하국대적퇴치',
+'삼한습유',
+'홍계월전',
+'효녀 지은',
+'장익성전',
+'조신몽 설화'
+           
+]
+
+## 현재 디렉토리에 존재하는 파일들 가져오기: file_li
+file_li = os.listdir(directory)
+#print(file_li[:5])    
+ 
+### file_li중에서 그림파일(.png, .jpg)만 가져오기: image_li
+image_li = [i for i in file_li if ('.png' in i) or ('.jpg' in i)]
+#print(image_li[:5])
+ 
+### 그림 1개만 예시로 보기: image_li[0]
+img_PIL = Image.open(str(directory)  + f"{image_li[0]}")  #디렉토리 수정
+#img_PIL.show()    #보기
+#display(img_PIL)  # 주피터에서 보기
+
+## ImageDraw.Draw()를 이용해 이미지에 글자쓰기
+
+font = ImageFont.truetype("C:/Users/user/AppData/Local/Microsoft/Windows/Fonts/국립박물관문화재단클래식M.ttf", #폰트위치
+                          70) #글꼴크기
+file = image_li[0]
+file_2 = str(directory) + str(file) 
+#print(file_2)
+for keyword in keywords :
+    img = Image.open(f"{file_2}") #파일위치 열기
+    draw = ImageDraw.Draw(img)  #이미지 열기
+    subject = str(keyword) +' 해설 주제\n 줄거리 요약 뜻 특징 분석'
+    draw.text((250, 400), subject, fill='white' , font=font, align='right')
+    #draw.text("원하는 글자위치 x좌표","원하는 글자위치 y좌표"),keyword,fill="white",font=selectedFont,align='center') # fill= 속성은 무슨 색으로 채울지 설정,font=는 자신이 설정한 폰트 설정
+    draw = ImageDraw.Draw(img)
+    #img.save(f"{file_2.split('.')[0]}"+_result+".jpg")
+    img.save(f"{file_2.split('.')[0]}_"+str(keyword)+".jpg")
+
+    size = 300,300 # 조절하고자 하는 size 저장 (x축 크기, y축 크기)
+
+    #for file in image_li:
+    img = Image.open(f"{file_2.split('.')[0]}_"+str(keyword)+".jpg")
+    img.thumbnail(size, Image.ANTIALIAS)
+    #display(img)
+    img.save(f"{file_2.split('.')[0]}_"+str(keyword)+".jpg")
+
+## 이미지에 글자쓴것 주피터로 보기 
+#for file in image_li:
+#    img_PIL = Image.open(f"{file_2.split('.')[0]}_result.jpg")
+    #img_PIL.show()
+    #display(img_PIL)
+
+
+
+
+#해설 주제 줄거리 요약 뚯 특징 분석
+
+
+
+
