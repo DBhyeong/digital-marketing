@@ -1,0 +1,31 @@
+import re #정규식
+#import emoji  #!pip install emoji  #이모티콘 제거용
+
+#def remove_emoji(text):
+#    return emoji.get_emoji_regexp().sub(u'', text)
+
+n = 7
+
+keyword = '화왕전'
+
+file = open('C:/Users/user/raw/literature/키워드_포스팅_'+str(n)+'_'+str(keyword)+'.txt', 'r', encoding='utf-8-sig')
+old_literature_text = file.read()
+
+#print(old_literature_text)
+
+
+special_char = '「」≪≫〉〈\/*?"<>|-․()' #특수문자
+for c in special_char:
+    if c in old_literature_text:
+        old_literature_text = old_literature_text.replace(c, '')  # 특수 문자 제거
+        old_literature_text = old_literature_text.replace("ㆍ", ",") #특수문자 변환
+        old_literature_text = old_literature_text.replace(":", "는")
+        old_literature_text = re.compile('[一-龥]').sub('', old_literature_text) # 정규식 한문 제거
+        #old_literature_text = emoji.get_emoji_regexp().sub(u'', old_literature_text)
+        #old_literature_text = re.compile('[一-龥]').sub('', old_literature_text) # 정규식 한문 제거
+        
+        #old_literature_text = re.compile('[^一-龥]').sub('', old_literature_text) # 정규식 한문 제거 검출
+                
+        #old_literature_text = re.compile(r'[가-힣]+?').sub('', old_literature_text)
+        
+print(old_literature_text)        
