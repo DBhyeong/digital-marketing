@@ -141,13 +141,29 @@ driver.implicitly_wait(10)
 
 #번역 메모장 열기
 
-n = 6
-keywords = ['용문전', '화왕전', '김진옥전']
+n = 7
+keywords = ['화왕전']
 
 for keyword in keywords :
     file = open('C:/Users/user/raw/literature/키워드_포스팅_'+str(n)+'_'+str(keyword)+'.txt', 'r', encoding='utf-8-sig')
     f_result = open('C:/Users/user/raw/literature/키워드_포스팅_'+str(n)+'_'+str(keyword)+'_result.txt', 'w', encoding='utf-8-sig')
     old_literature_text = file.read()
+    
+    # 에러메세지 Message: unknown error: ChromeDriver only supports characters in the BMP
+    # 특수문자, 정규식으로 한문 제거 이후에 다시 트라이 해보기로 한다.
+    
+    special_char = '「」≪≫〉〈\/*?"<>|-․()' #특수문자
+    for c in special_char:
+        if c in old_literature_text:
+            old_literature_text = old_literature_text.replace(c, '')  # 특수 문자 제거
+            old_literature_text = old_literature_text.replace("ㆍ", ",") #특수문자 변환
+            old_literature_text = old_literature_text.replace(":", "는") #특수문자 변환
+            old_literature_text = re.compile('[一-龥]').sub('', old_literature_text) # 정규식 한문 제거
+
+    # 에러메세지 Message: unknown error: ChromeDriver only supports characters in the BMP try 2
+    
+    #해결색으로 pyperclip으로 바꿔본다.  (해결완료)
+    
 
     #target_text_ja = []
 
@@ -160,12 +176,22 @@ for keyword in keywords :
     button = driver.find_element_by_css_selector('button#btnTranslate')  #번역 버튼 클릭
     x_button = driver.find_element_by_class_name('btn_text_clse___1Bp8a') #초기화 버튼 클릭
     switch_button = driver.find_element_by_class_name('btn_switch___x4Tcl') #소스/타겟 언어 바꾸기 버튼 클릭
-    # text - 리스트에서 하나씩 번역
+    
+    
+    #text - 리스트에서 하나씩 번역
     #for i in content :
         #print('원본글:'+str(i)) #원본
-    input_box.clear() #초기화
-    input_box.send_keys(str(old_literature_text))  #문장 넣기
+    #input_box.clear() #초기화
+    #input_box.send_keys(str(old_literature_text))  #문장 넣기
         # click translate button
+    
+    
+    #해결색으로 pyperclip로 트라이   
+    
+    pyperclip.copy(str(old_literature_text)) #복사
+    input_box.send_keys(Keys.CONTROL, 'v')  #붙여넣기
+    
+    
     button.click()  #번역 클릭
     time.sleep(5)
     driver.implicitly_wait(10)
