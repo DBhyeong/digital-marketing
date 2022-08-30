@@ -1,0 +1,87 @@
+import requests
+from    bs4      import BeautifulSoup
+import json 
+import time
+
+#categoryRootCategoryId = '50000003' #디지털가전 #대분류
+
+#50000087 학습기기
+#50000088 게임기/타이틀
+#50000089 PC
+#50000090 PC 악세서리
+#50000091 노트북 악세서리
+#50000092 태블릿 PC 악세서리
+#50000093 모니터주변기기
+#50000094 주변기기
+#50000095 멀티미디어장비
+#50000096 저장장치
+#50000097 PC부품
+#50000098 네트워크장비
+#50000099 소프트웨어
+#50000151 노트북
+#50000152 태블릿PC
+#50000153 모니터
+#50000204 휴대폰
+#50000205 휴대폰 악세서리
+#50000206 캠코더/캠코더용품
+#50000208 영상가전
+#50000209 음향가전
+#50000210 생활가전
+#50000211 이미용가전
+#50000212 계절가전
+#50000213 주방가전
+#50000214 자동차기기
+
+categoryRootCategoryId = '50000003' #디지털가전 #대분류
+categoryMidCategoryIds = ['50000087',
+'50000088',
+'50000089',
+'50000090',
+'50000091',
+'50000092',
+'50000093',
+'50000094',
+'50000095',
+'50000096',
+'50000097',
+'50000098',
+'50000099',
+'50000151',
+'50000152',
+'50000153',
+'50000204',
+'50000205',
+'50000206',
+'50000208',
+'50000209',
+'50000210',
+'50000211',
+'50000212',
+'50000213',
+'50000214'] #중분류  
+
+for categoryMidCategoryId in categoryMidCategoryIds :
+
+    url_2 = 'https://search.shopping.naver.com/best/category/keyword?categoryCategoryId={}&categoryChildCategoryId=&categoryDemo=A00&categoryMidCategoryId={}&categoryRootCategoryId={}&chartRank=1&period=P7D'.format(categoryMidCategoryId,categoryMidCategoryId,categoryRootCategoryId)
+
+    raw = requests.get(url=url_2, headers=headers)
+
+    html = BeautifulSoup(raw.text, 'html.parser')
+
+    #HTML 에 포함된 Javascript 태그의 json 크롤링
+    test =html.find('script', {'id' : '__NEXT_DATA__'}).text #텍스트만
+
+    dict_result = json.loads(test) # json으로 변환
+
+    #print(dict_result)
+    #popular_kws = dict_result['props']['pageProps']['dehydratedState']['queries'][1]['state']['data']['charts']
+
+    popular_kws= dict_result['props']['pageProps']['dehydratedState']['queries'][3]['state']['data']['charts']
+
+    for popular_kw in popular_kws :
+        rank = popular_kw['rank'] #순위
+        real_kw = popular_kw['exposeKeyword'] #키워드
+        real_kw = real_kw.replace(" ", "")
+        #print(str(rank) + '순위 키워드 : ' + str(real_kw))
+        print(str(real_kw))
+    time.sleep(1) #1초
