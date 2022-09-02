@@ -1,0 +1,48 @@
+import requests
+from bs4 import BeautifulSoup
+import re
+import json
+import urllib.parse
+
+#https://blog.daum.net/ki3696/38571
+    
+f = open (r"C:\Users\user\Desktop\text.txt", 'w', encoding='utf-8-sig')
+new_list = []    
+for page in range(1, 53) :
+    blogId = 'ki3696'
+    url = 'https://blog.daum.net/{}/category?page={}'.format(blogId, page) 
+
+    headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+                'Accept-Encoding': 'gzip'
+    }
+
+    raw = requests.get(url=url, headers=headers)
+    html = BeautifulSoup(raw.text, 'html.parser')
+
+    results = html.find_all('div', {'class' : 'box-timeline'})
+    #print(results)
+    for i in results :
+        i = i.find('a')['href']
+        detail_url = 'https://blog.daum.net' + str(i)
+        #print(detail_url)
+        detail_raw = requests.get(url=detail_url, headers=headers)
+        detail_html = BeautifulSoup(detail_raw.text, 'html.parser')
+
+        #print(detail_html)
+        detail_results = detail_html.find_all('a')
+
+        for j in detail_results :
+            try :
+                text = j['href']
+                #print(text)
+                if not text.find("download") == -1 :
+                    #print(text)
+                    new_list.append(text)
+                    f.write(text +'\n')
+                else :
+                    pass
+            except :
+                pass
+print("완료")
+f.close()
