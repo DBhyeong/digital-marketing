@@ -1,0 +1,23 @@
+import wget
+
+f = open ('C:/Users/user/raw/down/test_urls.txt', 'r', encoding='utf-8') #URL 입력
+
+urls = f.readlines()
+
+#source = wget.filename_from_url(url)
+#print(source)
+
+out_path = r"C:\Users\user\raw\down\down_bgmin21_잡탕" #다운로드 경로
+
+def download(url, out_path="."):
+    wget.download(url, out=out_path)
+    
+n = 1
+for url in urls :
+    try:
+        download(url, out_path)
+        print(str(n) + "의 파일 링크 저장 완료")
+    except :
+        pass
+    n +=1
+print("최종완료")
