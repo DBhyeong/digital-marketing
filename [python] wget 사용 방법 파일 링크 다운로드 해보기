@@ -1,4 +1,5 @@
 import wget
+import os
 
 f = open ('C:/Users/user/raw/down/test_urls.txt', 'r', encoding='utf-8') #URL 입력
 
@@ -7,13 +8,36 @@ urls = f.readlines()
 #source = wget.filename_from_url(url)
 #print(source)
 
-out_path = r"C:\Users\user\raw\down\down_bgmin21_잡탕" #다운로드 경로
+urls_2 = []
+
+############# 리스트 내 중복값 제거
+
+for v in urls :
+    if v not in urls_2 :
+        urls_2.append(v) #중복한 리스트 값 제거
+#print(new_list)
+#len(new_list)
+
+
+############# 웹페이지 링크 다운
+
+blogId = 'ha8140' #블로그 ID
+directory = 'C:/Users/user/raw/down/down_'+str(blogId)+''
+try:
+    if not os.path.exists(directory):
+        os.makedirs(directory)  #폴더 없으면 생성
+except OSError:
+    print("Error: Failed to create the directory.") 
+
+
+out_path = str(directory) #다운로드 경로
 
 def download(url, out_path="."):
     wget.download(url, out=out_path)
-    
+
+
 n = 1
-for url in urls :
+for url in urls_2 :
     try:
         download(url, out_path)
         print(str(n) + "의 파일 링크 저장 완료")
