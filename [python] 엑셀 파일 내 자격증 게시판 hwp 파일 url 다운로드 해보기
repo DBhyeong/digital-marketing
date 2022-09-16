@@ -206,3 +206,116 @@ for num in range(211, len(certificates)) :
 
 
 
+#실기 페이지 다운로드
+
+import requests
+from bs4 import BeautifulSoup
+import re
+import time
+import os
+import  urllib.request
+
+
+
+
+mid = 'tongsil'   
+folder_name = '실기'
+
+############# 최대 페이지 알기
+
+url = 'https://www.comcbt.com/xe/{}'.format(mid)  #URL 입력
+
+headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+            'Accept-Encoding': 'gzip'
+}
+
+
+raw = requests.get(url=url, headers=headers)
+
+html = BeautifulSoup(raw.text, 'html.parser')
+page_num = html.find_all('a', {'class' : 'frst_last'}) #페이지네이션 긁어오기
+
+for last in page_num :
+    last = last.text  #max 페이지 알기
+
+max_page = int(last) + 1 #+1 해두기
+
+
+
+############# 폴더 생성
+
+directory = 'C:/Users/user/raw/down/자격증/{}/'.format(folder_name) 
+try:
+    if not os.path.exists(directory):
+        os.makedirs(directory)  #폴더 없으면 생성
+except OSError:
+    print("Error: Failed to create the directory.") 
+ 
+    
+
+############### 페이지 긁기    
+    
+for n in range(1, max_page) : #페이지 개수  #max_page
+    url = 'https://www.comcbt.com/xe/index.php?mid={}&page='.format(mid) + str(n)  #URL 입력
+
+    headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+                'Accept-Encoding': 'gzip'
+    }
+
+
+    raw = requests.get(url=url, headers=headers)
+
+    html = BeautifulSoup(raw.text, 'html.parser')
+
+    results = html.find_all('a', {'class' : 'hx'})
+
+    for url in results : #게시판 URL 들어가기
+        url = url['href']
+        headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+                'Accept-Encoding': 'gzip'
+        }
+
+        raw = requests.get(url=url, headers=headers)
+
+        html = BeautifulSoup(raw.text, 'html.parser')
+
+        down_results = html.find('article')
+
+        down_results_2 = down_results.find_all('a')
+
+        ############# 웹페이지 링크 다운로드            
+        for i in down_results_2 :
+            try :
+                title = i.text #제목 
+                i = i['href'] #다운로드 링크
+                #print(title)
+                #print(i)
+                #print(i)
+                if not i.find("procFileDownload") == -1 :  #해당 문자를 포함할 경우(url기준)
+                    print(i)
+                    print(title)
+                    try :
+                        urllib.request.urlretrieve(i, str(directory)+str(title))   #png 아닌 jpg 파일로 저장
+                        time.sleep(1) #1초
+                    except :
+                        pass
+                else :
+                    pass
+            except :
+                pass
+    print(str(n) + "의 페이지 다운로드 완료되었습니다.")
+    time.sleep(1) #1초
+print("최종 완료")
+
+#'utf-8' codec can't decode byte 0xc1 in position 16: invalid start byte 
+#오류 발견시 encoding = 'cp949' 로 해주면 된다.
+
+
+
+
+
+
+
