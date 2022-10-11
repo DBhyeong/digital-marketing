@@ -1,0 +1,35 @@
+import os
+
+
+path = 'C:/Users/user/raw/down/img_down/img_down_list/' #디렉토리 경로
+file_list = os.listdir(path)  #파일명
+file_list_txt = [file for file in file_list if file.endswith(".txt")] #txt 파일만 가져오기
+
+#file_list_png_list = []
+
+file_list_txt_dir = [str(path) + str(txt) for txt in file_list_txt]  #txt 파일 디렉토리 리스트화
+    
+    
+for i in file_list_txt_dir :
+    try :
+        f = open(i, 'r', encoding='utf-8')
+        title = f.readlines()
+        title = title[2]
+        title = title.replace("\n", "")
+        #print(title)  #제목
+        f.close()  #제목 끝
+
+        f = open(i, 'r', encoding='utf-8')
+        content = f.read()
+        content = content.replace('﻿________________\n\n', '')  #필터링(본문)
+        #print(content) #본문
+        f.close() # 본문 끝
+
+        f_2 = open(str(path) + str(title)+'.txt', 'w', encoding='utf-8-sig') #메모장 열기
+        f_2.write(str(content)+'\n') #넣기
+        f_2.close() #끝
+        print(str(i) + "의 메모장 옮기기 완료")
+    except :
+        print(str(i) + "의 메모장 옮기기 실패")
+    
+print('최종완료')
