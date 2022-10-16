@@ -1,0 +1,14 @@
+import os
+
+path = 'C:/Users/user/raw/down/health/' #디렉토리 경로
+file_list = os.listdir(path)  #파일명
+
+#file_list_txt = [file for file in file_list if file.endswith(".txt")] #txt 파일만 가져오기
+
+for f_folder in file_list :
+    img_dir = str(path) + str(f_folder) + '/'
+    img_dir_f = os.listdir(img_dir)
+    file_list_jpg = [file for file in img_dir_f if file.endswith(".jpg")]
+    for f in file_list_jpg :
+        img_directory = str(img_dir) + str(f)
+        print(img_directory)
