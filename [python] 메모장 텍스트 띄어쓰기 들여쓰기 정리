@@ -1,0 +1,28 @@
+import json
+import time
+import re
+import os
+
+path = 'C:/Users/user/raw/korean_literature/문학이론/'
+
+file_list = os.listdir(path)  #파일명
+file_list_txts = [file for file in file_list if file.endswith(".txt")] #txt 파일만 가져오기
+
+for file_list_txt in file_list_txts :
+    f = open(str(path) + str(file_list_txt), 'r',  encoding='utf8')  #메모장 기준
+    text_list = f.read()
+    text_list = text_list.replace("\xa0", " ")
+    text_list = text_list.replace(" \n", " ")
+    text_list = text_list.replace("\n                     ", " ")
+    f.close() #메모장 닫기
+    file_list_txt = file_list_txt.replace(".txt", "")
+    f_1 = open(str(path) + str(file_list_txt)+ '_result.txt', 'w',  encoding='utf8')  #메모장 기준
+    f_1.write(str(text_list) + '\n')
+    f_1.close()
+    print(str(file_list_txt) + '의 메모장 필터링 완료')
+#f = open('C:/Users/user/raw/korean_literature/문학이론/고대수필.txt', 'r',  encoding='utf8')  #메모장 기준
+
+#text_list = f.read()
+#text_list = text_list.replace("\xa0", " ")
+#text_list = text_list.replace(" \n", " ")
+#print(text_list)
