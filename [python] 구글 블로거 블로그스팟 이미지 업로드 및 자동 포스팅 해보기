@@ -1,0 +1,147 @@
+# 구글 블로거 API 인증 (2번 해야됨)
+
+import sys
+import os
+import pickle
+from oauth2client import client
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+
+#hongdaearea.blogspot.com 
+
+BLOG_ID = "7084355431426392649"   # hongdaearea.blogspot.com    잡부정보 
+#SCOPES = ['https://www.googleapis.com/auth/blogger', 'https://www.googleapis.com/auth/drive.file']
+
+SCOPES = ['https://www.googleapis.com/auth/blogger']
+
+def get_blogger_service_obj():
+    creds = None
+    if os.path.exists('auto_token.pickle'):
+        with open('auto_token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'C:/Users/user/blogger/client_secret.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('auto_token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+    blog_service = build('blogger', 'v3', credentials=creds)
+    drive_service = build('drive', 'v3', credentials=creds)
+
+    return drive_service,blog_service
+
+drive_handler, blog_handler = get_blogger_service_obj()
+
+
+
+import os
+import time
+
+
+#이미지
+img_urls = [ 'http://15.165.222.35/dd255u.jpg'
+            
+]
+
+#메모장
+txt_files = [  'C:/Users/user/raw/down/health/105/105.txt'
+             
+]
+#n = 0
+
+
+for img_url,txt_file in zip(img_urls, txt_files) :
+    #path = 'C:/Users/user/raw/down/health/'+str(i)+'/'
+    #file_list = os.listdir(path)
+    #file_list_png = [file for file in file_list if file.endswith(".txt")]
+    
+    file_list_png = [txt_file] #리스트화
+    
+    for blog_content in file_list_png :
+        #txt_file_directory = str(path) + str(blog_content)
+        txt_file_directory = str(blog_content)
+        
+        f = open(txt_file_directory, 'r', encoding='utf-8')  #메모장 파일열기
+        content_list = f.readlines() #본문  
+        blogger_title = content_list[0]
+        blogger_title_2 = blogger_title.replace("\ufeff", "")
+        content_list_2 = []
+        for i in content_list : 
+            i = i.replace("\ufeff", "")
+            i_text = '<p>' + str(i) + '</p>'  #html 넣자
+            content_list_2.append(i_text)
+
+
+        #이미지 삽입란
+        
+        #img_url = img_url[n] 
+        
+        img_url = '"' + str(img_url) + '"'
+
+        content_list_3 = """
+        <div style="text-align: left;">
+         <div class="separator" style="clear: both; text-align: center;">
+          <p style="text-align: left;">
+          </p>
+         </div>
+        </div>
+        <div style="text-align: left;">
+         <div class="separator" style="clear: both; text-align: center;">
+          <a href="""+str(img_url)+""" imageanchor="1" style="margin-left: 1em; margin-right: 1em;">
+           <img border="0" data-original-height="640" data-original-width="720" height="284" src="""+str(img_url)+""" width="320"/>
+          </a>
+         </div>
+         <br/>
+         <pre style="background-color: white; border-radius: 0px; border: 0px; box-sizing: border-box; font-family: D2Coding; font-size: 12px; line-height: inherit; margin-bottom: 0px; margin-top: 0px; overflow-wrap: break-word; overflow: auto; padding: 1px 0px; vertical-align: baseline; white-space: pre-wrap; word-break: break-all;"><br/></pre>
+        </div>
+
+        """
+
+        #제목 
+
+        content_list_3 += """
+        </h1>
+        <h1 style="text-align: left;">
+         <b>
+          """+blogger_title_2+"""
+         </b>
+        </h1>
+
+        """
+
+
+        #본문
+
+        content_list_3 += str(content_list_2)
+        content_list_3 = content_list_3.replace("[", "")
+        content_list_3 = content_list_3.replace("\'", "")
+        content_list_3 = content_list_3.replace("\\n", "")
+        content_list_3 = content_list_3.replace(">,", ">")
+        content_list_3 = content_list_3.replace("\\u200b", "")
+        content_list_3 = content_list_3.replace('\'', '')
+        content_list_3 = content_list_3.replace(']', '')
+
+        #print(content_list_3)    
+
+        keyword = str(blogger_title)
+
+        data = {
+        'title': blogger_title_2, #제목
+        'content': content_list_3, #본문
+        'labels' : keyword, #해시태그
+        'blog': {
+            'id': BLOG_ID, # The identifier of the Blog that contains this Post.
+          },}
+        posts = blog_handler.posts()
+        res = posts.insert(blogId=BLOG_ID, body=data, isDraft=False, fetchImages=True).execute() 
+        #res
+
+        f.close() #파일닫기
+        print(str(blogger_title_2)+ "의 포스팅 완료")
+    time.sleep(20) #20초
+    #n+=1
