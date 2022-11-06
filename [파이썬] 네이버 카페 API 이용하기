@@ -1,0 +1,38 @@
+import urllib.request
+import json
+from pandas.io.json import json_normalize
+import hashlib
+import hmac
+import base64
+import pandas as pd
+
+keyword = '학원 개원' #키워드검색
+
+
+client_id = "" #클라이언트 ID
+client_secret = "" #클라이언트 시크릿
+encText = urllib.parse.quote(keyword) 
+
+cafe_url = "https://openapi.naver.com/v1/search/cafearticle?query=" + encText + '&display=100&start=1' #카페 100건수
+request_2 = urllib.request.Request(cafe_url) 
+request_2.add_header("X-Naver-Client-Id",client_id)
+request_2.add_header("X-Naver-Client-Secret",client_secret)
+response_2 = urllib.request.urlopen(request_2)
+rescode_2 = response_2.getcode()
+if(rescode_2==200):
+    response_body_2 = response_2.read()
+    json_str_2 = response_body_2.decode('utf-8')
+else:
+    print("Error Code:" + rescode_2)
+
+json_object_2  = json.loads(json_str_2) #json 변환
+df_2 = pd.DataFrame(json_object_2['items'])
+df_2
+
+#df_2['title'] = df_2['title'].str.replace("<b>", "")
+#df_2['title'] = df_2['title'].str.replace("</b>", "")
+#df_2['description'] = df_2['description'].str.replace("<b>", "")
+#df_2['description'] = df_2['description'].str.replace("</b>", "")
+
+
+df_2.to_csv('C:/Users/user/Desktop/에이블스튜디오/학원개원_강사_크롤링/result_naver.csv', encoding='utf-8-sig')
