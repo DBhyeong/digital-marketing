@@ -1,0 +1,285 @@
+from __future__ import print_function
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import os
+from googleapiclient.discovery import build
+from httplib2 import Http
+from oauth2client import file, client, tools
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+import pickle
+import os.path
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+import  warnings
+from    selenium import webdriver
+from    selenium.webdriver.support.ui import WebDriverWait
+from    selenium.webdriver.support import expected_conditions as EC
+from    selenium.webdriver.common.by import By
+from    selenium.webdriver.common.keys import Keys 
+from    selenium.webdriver.common.action_chains import ActionChains
+from    selenium.common.exceptions import NoSuchElementException,StaleElementReferenceException
+from    bs4      import BeautifulSoup
+import  time
+import  pyperclip
+import  requests
+import  datetime
+import  pymssql
+import  pandas as pd
+from  pandas.core.frame import DataFrame
+import  matplotlib.pyplot as plt
+import  chromedriver_autoinstaller
+import  subprocess
+
+from    selenium import webdriver
+from    selenium.webdriver.chrome.options import Options
+from    selenium.webdriver.common.alert import Alert
+from    selenium.webdriver.chrome.service import Service
+
+import  chromedriver_autoinstaller
+import  subprocess
+import  shutil 
+import  xlrd
+import  openpyxl 
+import  pygsheets
+import  csv
+import  re
+import  webbrowser
+import  os
+import  sys
+import  urllib.request
+import  json
+from    pandas.io.json import json_normalize
+import  hashlib
+import  hmac
+import  base64
+import  numpy as np
+import  autoit #autoit는 반드시 autoit 프로그램이 깔려있어야됨
+import  pyautogui
+from PIL import ImageGrab
+try:
+    from PIL import Image
+except ImportError:
+    import Image
+import pytesseract
+import cv2
+import numpy as np
+import glob
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+import io
+
+from time import gmtime, strftime
+
+import youtube_dl
+from youtube_transcript_api import YouTubeTranscriptApi
+
+import pdfkit
+from PyPDF2 import PdfFileReader, PdfFileWriter
+from tika import parser
+import pdfkit
+
+import pytumblr #텀블러
+from requests_oauthlib import OAuth1Session
+
+import tweepy #트위터용 
+import pytumblr #텀블러
+from requests_oauthlib import OAuth1Session
+import config
+
+from instagrapi import Client
+from instagrapi.types import StoryMention, StoryMedia, StoryLink, StoryHashtag
+import urllib.request
+
+#네이버 메일 포워딩 import 리스트  
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.mime.application import MIMEApplication
+
+warnings.filterwarnings('ignore')
+
+
+
+##############################크롬 구동
+
+
+try:
+    shutil.rmtree(r"c:\chrometemp")  #쿠키 / 캐쉬파일 삭제
+except FileNotFoundError:
+    pass
+subprocess.Popen(r'C:\Program Files\Google\Chrome\Application\chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\chrometemp"') # 디버거 크롬 구동
+option = Options()
+option.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+chrome_ver = chromedriver_autoinstaller.get_chrome_version().split('.')[0]
+try:
+    s = Service(f'./{chrome_ver}/chromedriver.exe')
+    driver = webdriver.Chrome(service=s, options=option)
+    #driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe', options=option)
+except:
+    chromedriver_autoinstaller.install(True)
+    s = Service(f'./{chrome_ver}/chromedriver.exe')
+    driver = webdriver.Chrome(service=s, options=option)
+    #driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe', options=option)
+    #driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe', options=option)
+driver.maximize_window() #최대창
+time.sleep(3)    
+driver.implicitly_wait(10)
+action = ActionChains(driver) #액션지정
+
+
+
+
+################################ 엑셀파일 지정
+
+f = open("C:/Users/user/Desktop/에이블스튜디오/학원개원_강사_크롤링/crawling_1_result.csv", 'w', encoding='utf-8-sig')
+f.write('articleid,article_url,article_subject,td_date, td_view' + '\n')
+
+
+################################ 네이버 로그인
+
+#네이버 이동
+
+url = 'https://www.naver.com'
+driver.get(url)
+time.sleep(5)
+driver.implicitly_wait(10)
+
+driver.find_element_by_class_name('link_login').click()
+time.sleep(1)
+driver.implicitly_wait(10)
+
+#id, pw 입력할 곳 찾기
+
+tag_id = driver.find_element_by_name('id')
+tag_pw = driver.find_element_by_name('pw')
+driver.implicitly_wait(10)
+
+#id 입력
+
+tag_id.click()
+pyperclip.copy('')
+tag_id.send_keys(Keys.CONTROL, 'v')
+time.sleep(2)
+driver.implicitly_wait(10)
+
+#pw 입력
+
+tag_pw.click()
+pyperclip.copy('')
+tag_pw.send_keys(Keys.CONTROL, 'v')
+time.sleep(2)
+driver.implicitly_wait(10)
+
+#로그인 버튼 클릭
+
+login_btn = driver.find_element_by_id('log.login')
+login_btn.click()
+time.sleep(1)
+driver.implicitly_wait(10)
+
+
+################################ 네이버 카페 이동
+
+
+for page in range(2, 4) :  #페이지 시작은 2부터
+    naver_cafe_url = 'https://cafe.naver.com/suhui?iframe_url=/ArticleList.nhn%3Fsearch.clubid=10197921%26search.menuid=543%26search.boardtype=L%26search.totalCount=151%26search.cafeId=10197921%26search.page={}'.format(page)
+
+    driver.get(naver_cafe_url)
+    time.sleep(3)
+    driver.implicitly_wait(10)
+    action = ActionChains(driver) #액션지정
+
+
+    ################################ 네이버 카페 게시글 URL 가져오기
+
+
+    iframes = driver.find_elements_by_tag_name('iframe') #iframe 정보 담기
+    driver.switch_to.frame(iframes[6]) #6번째 iframe으로 이동
+    html = driver.page_source #html 파싱
+    soup = BeautifulSoup(html, 'lxml') #html 파싱
+
+    #print(soup.prettify()) #보자
+
+
+    """
+    #아이프레임 정보 아는 방법
+
+    iframes = driver.find_elements_by_tag_name('iframe')
+    for i, iframe in enumerate(iframes):
+        try:
+            print('%d번째 iframe 입니다.' % i)
+            # i 번째 iframe으로 변경합니다.
+            driver.switch_to.frame(iframes[i])
+            # 변경한 iframe 안의 소스를 확인합니다.
+            print(driver.page_source)
+            # 원래 frame으로 돌아옵니다.
+            driver.switch_to.default_content()
+        except:
+            # exception이 발생했다면 원래 frame으로 돌아옵니다.
+            driver.switch_to.default_content()
+            # 몇 번째 frame에서 에러가 났었는지 확인합니다.
+            print('pass by except : iframes[%d]' % i)
+            # 다음 for문으로 넘어갑니다.
+
+    """
+
+    results = soup.find_all('td', {'class' : 'td_article'})
+    
+    result_2 = soup.find_all('td', {'class' : 'td_date'}) #날짜
+    result_3 = soup.find_all('td', {'class' : 'td_view'}) #조회수
+    
+    for i in range(0, len(results)) :
+        
+        ####################### 카페 게시글로 기본정보 크롤링
+
+        articleid = results[i].find('div', {'class' : 'inner_number'}).text  #게시글 번호
+        article_url = 'https://cafe.naver.com' + results[i].find('a')['href']  #게시글 URL
+        article_subject = results[i].find('a').text.replace("\r", "").replace("\n", "").replace("\t", "").replace(",", "").replace("  ", "")  #제목  #조회수 #날짜
+        td_date = result_2[i].text.replace('.', '-')  #날짜
+        td_date = td_date[:10] #필터링
+        td_veiw = result_3[i].text.replace(",", "")  #조회수
+        print('--------------------------------'+ str(i) + '번째 게시글 정보 --------------------------------')
+        print('게시글 번호 : ' +str(articleid))
+        print('게시글 URL : ' + str(article_url))
+        print('게시글 제목 : ' + str(article_subject))
+        print('게시글 날짜 : ' + str(td_date))
+        print('게시글 날짜 : ' + str(td_veiw))
+        
+        #최종 입력
+        f.write(str(articleid) + ',' + str(article_url) + ','+ str(article_subject) + ',' + str(td_date)+ ',' +str(td_veiw)  +'\n')
+        
+        ####################### 카페 게시글 크롤링(제외)
+        """
+        
+        driver.get(article_url)
+        time.sleep(3)
+        driver.implicitly_wait(10)
+        action = ActionChains(driver) #액션지정
+
+        iframes = driver.find_elements_by_tag_name('iframe') #iframe 정보 담기
+        driver.switch_to.frame(iframes[6]) #6번째 iframe으로 이동
+        html = driver.page_source #html 파싱
+        article_soup = BeautifulSoup(html, 'lxml') #html 파싱
+
+        try :
+            article_content = article_soup.find("div", {"class" : "se-module se-module-text"}).text.replace("\u200b", "").replace("\n", "").replace(",", "")
+        except :
+            article_content = '없음'
+        print('게시글 본문 : ' + str(article_content))
+
+        #최종 입력
+
+        f.write(str(articleid) + ',' + str(article_url) + ','+ str(article_subject) + ',' + str(article_content) +'\n')
+        
+        """
+
+f.close()
+
+print("최종완료")
+
+driver.close()
+driver.quit()
+
