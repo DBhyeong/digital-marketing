@@ -1,0 +1,31 @@
+import urllib.request
+import json
+from pandas.io.json import json_normalize
+import hashlib
+import hmac
+import base64
+import pandas as pd
+import requests
+
+import requests
+import pandas as pd
+import numpy as np
+
+
+REST_API = ''
+
+query = '학원 개원' #키워드
+size = 50 #문서수
+page_num = 1 #페이지
+sort = 'accuracy' #정확도
+
+url = 'https://dapi.kakao.com//v2/search/cafe'
+params = {'query': query
+          ,'size' : size
+          ,'page': page_num}
+headers = {"Authorization": "KakaoAK " + str(REST_API)}
+
+response = requests.get(url, params=params, headers=headers).json()['documents']
+
+cafe_list_data = pd.DataFrame(response)
+cafe_list_data.to_csv('C:/Users/user/Desktop/에이블스튜디오/학원개원_강사_크롤링/result_daum.csv', encoding='utf-8-sig')
