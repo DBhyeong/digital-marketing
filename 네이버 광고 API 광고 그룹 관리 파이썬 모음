@@ -101,7 +101,7 @@ r = requests.get(BASE_URL + uri, params={'nccAdgroupId': created_adgroup['nccAdg
 print("response status_code = {}".format(r.status_code))
 print("response body = {}".format(r.json()))
 
-# 3. UPDATE AdKeyword
+# 3. UPDATE AdKeyword 
 
 uri = '/ncc/keywords'
 method = 'PUT'
