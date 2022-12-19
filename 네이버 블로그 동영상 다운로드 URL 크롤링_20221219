@@ -1,0 +1,48 @@
+import requests
+from bs4 import BeautifulSoup
+import json
+
+#블로그 URL
+
+blog_url = 'https://blog.naver.com/johnkth/222959590684' #블로그 URL
+
+headers = { 'Accept-Language' : 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
+            'Accept-Encoding': 'gzip'
+}
+
+response = requests.get(url=url, headers=headers)
+soup = BeautifulSoup(response.text, 'html.parser')
+ifra = soup.find('iframe', id='mainFrame')
+
+
+#블로그 URL HTML 내 비디오 정보 크롤링
+
+post_url = 'https://blog.naver.com' + ifra['src']
+res = requests.get(post_url)
+soup2 = BeautifulSoup(res.text, 'html.parser')
+
+#print(soup2)
+
+vid_scripts = soup2.find('script', {'class' : '__se_module_data'})
+vid_data = vid_scripts['data-module']
+data = json.loads(vid_data)
+vid = data['data']['vid']  #비디오 id
+inkey = data['data']['inkey']  #비디오 inkey
+
+
+#비디오 URL 크롤링
+
+video_url ='https://apis.naver.com/rmcnmv/rmcnmv/vod/play/v2.0/{}?key={}'.format(vid, inkey)
+response = requests.get(url=video_url, headers=headers)
+html = BeautifulSoup(response.text, 'html.parser')
+
+video_data = json.loads(html.text)
+
+video_f = video_data['videos']['list'][0]['source']  #0번째
+video_f = video_f.replace("∈", "&")
+
+#최종 비디오 다운로드 URL 완료
+
+print(video_f) #완료
+
