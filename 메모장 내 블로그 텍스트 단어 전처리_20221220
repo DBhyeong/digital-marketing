@@ -1,0 +1,283 @@
+from konlpy.tag import Kkma, Okt, Komoran, Hannanum
+from konlpy.utils import pprint
+from collections import  Counter
+import re
+import os
+
+from pykospacing import Spacing
+from hanspell import spell_checker
+
+
+
+###################### 파일 내 메모장 텍스트 디렉토리 주소 가져오기
+num=10
+
+path = 'C:/Users/user/naverblog_ableclass_setup/' #디렉토리 경로
+file_list = os.listdir(path)  #파일명
+
+#h2_class_name = re.search('<div class="relatedTags_relation_(.+?)">', str(shop_rel_soup)).group()
+
+f_title = []
+
+for f_txt in file_list :
+    try :
+        txt = re.search('^'+str(num) +'(.+)', str(f_txt)).group()
+        f_title.append(txt)
+    except :
+        pass
+
+    
+txt_dir = str(path) + str(f_title[0])
+txt_dir_f = os.listdir(txt_dir)
+    
+
+for f_folder in txt_dir_f :
+    txt_dir = str(path) + str(f_title[0])
+    txt_dir_file = str(txt_dir) + '/' + str(f_folder)
+    txt_dir_f = os.listdir(txt_dir)
+    file_list_jpg = [file for file in txt_dir_f if file.endswith(".txt")]
+    for f in file_list_jpg :
+        txt_directory = str(txt_dir) + '/' + str(f)
+
+
+    
+###################### 파일 내 메모장 텍스트 디렉토리 주소 가져오기
+
+
+content_txt = open(txt_directory, 'r', encoding='utf-8-sig')
+
+text = content_txt.read()
+text = text.replace("\u200b", "")
+
+######################전처리
+
+#content_text = f.read() #read로 해야됨
+content_text = text
+
+#특수문자 제거
+
+def clean_text(inputString): #함수화
+    text_rmv = re.sub('[-=+,#/\:^@*\"※~ㆍ』‘|\(\)\[\]`\'…》\”\“\’·]', ' ', inputString)
+    text_rmv = ' '.join(text_rmv.split())
+    return text_rmv
+
+content_text = clean_text(content_text)
+
+print(str(txt_directory) + "의 특수문자 제거완료")
+
+
+
+#이모지 제거
+
+emoji_pattern = re.compile("["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                           "]+", flags=re.UNICODE)
+
+content_text = emoji_pattern.sub(r'', content_text)
+content_text = content_text.replace("\u200b", "")
+content_text = content_text.replace("?", ".")
+content_text = content_text.replace("!", ".")
+content_text_list = content_text.split('.') #마침표로 리스트화
+
+print(str(txt_directory) + "의 이모지 제거 완료")
+
+#띄어쓰기
+
+f_txt = open(r"C:\Users\user\Desktop\text_1_Spacing.txt", 'w', encoding='utf-8-sig')
+spacing = Spacing()
+
+for sent in content_text_list :
+    new_sent = sent.replace(" ", '') #띄어쓰기 없는 문장 만들기
+    kospacing_sent = spacing(new_sent)
+    kospacing_sent = str(kospacing_sent) + '.'  #마침표 찍기
+    f_txt.write(kospacing_sent + '\n')
+f_txt.close()
+print(str(txt_directory) + "의 띄어쓰기 처리 완료")
+
+
+#맞춤법
+
+f_txt = open(r"C:\Users\user\Desktop\text_1_Spacing.txt", 'r', encoding='utf-8-sig')
+hanspell_txt = open(r"C:\Users\user\Desktop\hanspell_1_txt.txt", 'w', encoding='utf-8-sig')
+
+text_1_Spacing = f_txt.read()  #읽기
+
+text_1_Spacing_list = text_1_Spacing.split('.') #마침표 리스트화
+
+for sent in text_1_Spacing_list :
+    try :
+        sent = sent + '.'
+        spelled_sent = spell_checker.check(sent)
+        hanspell_sent = spelled_sent.checked
+        hanspell_txt.write(hanspell_sent + '\n')
+    except :
+        print("에러발생")
+f_txt.close()
+hanspell_txt.close()
+
+print(str(txt_directory) + "의 맞춤법 처리 완료")
+
+
+final_content_f = open(r"C:\Users\user\Desktop\hanspell_1_txt.txt", 'r', encoding='utf-8-sig')
+final_content_f_txt = final_content_f.read()
+
+#print(final_content_f_txt)  #최종 전처리된 문자열 확인
+
+
+
+#########################설치 사례 텍스트만 가져오기
+
+smartboard_setup = []
+
+if final_content_f_txt.find("번째") > 0 : #주제
+    smartboard_setup.append(final_content_f_txt[final_content_f_txt.find("번째 ") : len(final_content_f_txt)]) #해당 주제 단어 이후 끝단어까지 정렬 <- 주제
+
+    
+for i  in smartboard_setup :
+    smartboard_setup_txt = i.split('.')
+
+#smartboard_setup_txt[1:]
+
+
+#########################설치 사례 텍스트만 최종 입력 완료
+
+posting = open(str(txt_dir) + '/' + '포스팅.txt' , 'w', encoding='utf-8-sig')
+
+for i in range(1, len(smartboard_setup_txt)) :
+    txt = smartboard_setup_txt[i] + "."
+    posting.write(txt)
+    
+additional_txt =  '\n' + "전국 무료 시연 문의 1855-4029" +'\n'  
+additional_txt += "더 자세한 사항은 에이블클래스 네이버 검색하세요!" +'\n'  
+additional_txt += '네이버블로그	https://blog.naver.com/ablewithus' + '\n'
+additional_txt += '스마트스토어    https://smartstore.naver.com/ableclass' + '\n'
+additional_txt += '\n'
+additional_txt += '경상남도 창원시 의창구 차룡로48번길 44 1301호, 1302호 (팔용동, 창원스마트업타워)'
+
+posting.write(additional_txt + '\n')
+posting.close()
+
+
+posting_summary = open(str(txt_dir) + '/' + '포스팅_summary.txt' , 'w', encoding='utf-8-sig')
+
+for i in range(1, 5) :
+    txt = smartboard_setup_txt[i] + "."
+    posting_summary.write(txt)
+    
+additional_txt =  '\n' + "전국 무료 시연 문의 1855-4029" +'\n'  
+additional_txt += "더 자세한 사항은 에이블클래스 네이버 검색하세요!" +'\n'  
+additional_txt += '네이버블로그	https://blog.naver.com/ablewithus' + '\n'
+additional_txt += '스마트스토어    https://smartstore.naver.com/ableclass' + '\n'
+additional_txt += '\n'
+additional_txt += '경상남도 창원시 의창구 차룡로48번길 44 1301호, 1302호 (팔용동, 창원스마트업타워)'
+
+posting_summary.write(additional_txt + '\n')
+posting_summary.close()
+
+print("최종완료")
+
+############################# 해시태그
+
+from konlpy.tag import Kkma, Okt, Komoran, Hannanum
+from konlpy.utils import pprint
+from collections import  Counter
+
+
+f = open(str(txt_dir) + '/' + '포스팅.txt' , 'r', encoding='utf-8-sig')
+
+text = f.read()
+
+
+okt = Okt()
+noun = okt.nouns(text)
+
+x = Counter(noun)
+
+x.most_common()  #가장 많은 빈도수 정렬
+
+x_most_common = sorted(x, key=x.get, reverse=True)  #가장 많은 단어만 리스트화
+
+
+x_most_common_2 = []
+#sorted(x.items(), key=lambda pair: pair[1], reverse=True)  #key, value 쌍으로만 값 정렬
+
+
+for i in x_most_common[:12] : #가장 많이 쓰인 상위 7개 단어 기준
+    if len(i) == 1 : #단어 1개인경우 제외
+        pass
+    else :
+        #print(i) 
+        x_most_common_2.append(i)
+#print(x_most_common_2) #최종 5개 단어 보기
+print('#' + x_most_common_2[0] 
+      + ' #' +x_most_common_2[1] 
+      + ' #' +x_most_common_2[2] 
+      + ' #' +x_most_common_2[3] 
+      + ' #' +x_most_common_2[4] 
+      + ' #' +x_most_common_2[5] 
+      + ' #' +x_most_common_2[6]
+      + ' #에이블클래스' 
+      + ' #ableclass'
+      + ' #티지전자칠판'
+      + ' #전자칠판'
+      + ' #스마트전자칠판'
+      + ' #스마트칠판'
+      + ' #스마트보드'
+     ) #최종 5개 단어 보기
+
+    
+f.close()
+
+
+print('' + x_most_common_2[0] 
+      + ' ,' +x_most_common_2[1] 
+      + ' ,' +x_most_common_2[2] 
+      + ' ,' +x_most_common_2[3] 
+      + ' ,' +x_most_common_2[4] 
+      + ' ,' +x_most_common_2[5] 
+      + ' ,' +x_most_common_2[6]
+      + ' ,에이블클래스' 
+      + ' ,ableclass'
+      + ' ,티지전자칠판'
+      + ' ,전자칠판'
+      + ' ,스마트전자칠판'
+      + ' ,스마트칠판'
+      + ' ,스마트보드'
+     ) #최종 5개 단어 보기
+
+
+
+f = open(str(txt_dir) + '/' + '포스팅_해시태그.txt' , 'w', encoding='utf-8-sig')
+
+f.write('#' + x_most_common_2[0] 
+      + ' #' +x_most_common_2[1] 
+      + ' #' +x_most_common_2[2] 
+      + ' #' +x_most_common_2[3] 
+      + ' #' +x_most_common_2[4] 
+      + ' #' +x_most_common_2[5] 
+      + ' #' +x_most_common_2[6]
+      + ' #에이블클래스' 
+      + ' #ableclass'
+      + ' #티지전자칠판'
+      + ' #전자칠판'
+      +'\n') #최종 5개 단어 보기
+
+f.write('' + x_most_common_2[0] 
+      + ' ,' +x_most_common_2[1] 
+      + ' ,' +x_most_common_2[2] 
+      + ' ,' +x_most_common_2[3] 
+      + ' ,' +x_most_common_2[4] 
+      + ' ,' +x_most_common_2[5] 
+      + ' ,' +x_most_common_2[6]
+      + ' ,에이블클래스' 
+      + ' ,ableclass'
+      + ' ,티지전자칠판'
+      + ' ,전자칠판'
+     ) #최종 5개 단어 보기
+
+f.close()
+
+print("해시태그 작업 완료")
