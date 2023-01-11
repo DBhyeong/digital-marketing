@@ -1,0 +1,63 @@
+#구글
+
+
+#https://serpapi.com/users/welcome 가입 후 api key 발급
+#pip 설치( 파이썬 3.7 이상 기준) !pip install google-search-results
+
+#api key ='' #api 키
+
+from serpapi import GoogleSearch
+
+keyword= '공부방 전자칠판'  #키워드
+
+params = {
+  "q": keyword,  #키워드
+  "hl": "ko",  #언어
+  "gl": "kr",  #나라명(코드)
+  "api_key": "" #api 키
+}
+
+search = GoogleSearch(params)
+results = search.get_dict()
+
+organic_results = results['organic_results']
+
+for i in organic_results :
+    position =  i['position'] #순위
+    title = i['title'] #제목
+    link = i['link'] #웹사이트
+    snippet = i['snippet'] #스니펫
+    
+    print(str(position) + "위, 제목: " + str(title) + ', link : ' + str(link) )
+   
+   
+   
+   
+#빙
+
+#api key =''
+
+from serpapi import GoogleSearch
+
+keyword= '공부방 전자칠판'
+
+params = {
+   "engine" : "bing", 
+  "q": keyword,  #쿼리
+  "cc": "KR",  #나라코드
+  "api_key": "",  #api 키
+   "first" : '10'  #10위까지
+}
+
+search = GoogleSearch(params)
+results = search.get_dict()
+
+organic_results = results['organic_results']
+
+for i in organic_results :
+    position =  i['position'] #순위
+    title = i['title'] #제목
+    link = i['link'] #웹사이트
+    snippet = i['snippet'] #스니펫
+    
+    print(str(position) + "위, 제목: " + str(title) + ', link : ' + str(link) )
