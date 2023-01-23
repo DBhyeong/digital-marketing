@@ -1,0 +1,91 @@
+#!pip install pure-python-adb  설치
+import socket
+import requests
+import re
+from ppadb.client import Client as AdbClient
+import time
+import os
+
+client = AdbClient(host="127.0.0.1", port=5037)
+devices = client.devices()
+d = devices[0]
+
+print(d.serial)  #시리얼 번호
+
+req = requests.get("http://ipconfig.kr")
+print("외부 IP: ", re.search(r'IP Address : (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', req.text)[1])
+
+#  usb 테더링 제어 
+os.system("svc data disable")
+time.sleep(5.0)
+os.system("svc data enable")
+time.sleep(5.0)
+
+#에어플레인 모드 ON
+
+d.shell("svc data disable")
+d.shell("adb shell settings put global airplane_mode_on 1")
+d.shell("adb shell am broadcast -a android.intent.action.AIRPLANE_MODE --ez state true")
+d.shell('adb shell cmd connectivity airplane-mode enable') 
+
+time.sleep(5.0)
+
+#에어플레인 모드 OFF
+
+d.shell("svc data enable")
+d.shell("adb shell settings put global airplane_mode_on 0")
+d.shell("adb shell am broadcast -a android.intent.action.AIRPLANE_MODE --ez state false")
+d.shell('adb shell cmd connectivity airplane-mode disable')
+
+time.sleep(5.0)
+
+#os.system("adb shell svc data disable")
+#os.system("adb shell svc data enable")
+
+#os.system("adb shell ipconfig /release")
+#os.system("adb shell ipconfig /renew")
+
+req = requests.get("http://ipconfig.kr")
+print("외부 IP: ", re.search(r'IP Address : (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', req.text)[1])
+
+
+#!pip install pure-python-adb  설치
+import socket
+import requests
+import re
+from ppadb.client import Client as AdbClient
+import time
+import os
+
+client = AdbClient(host="127.0.0.1", port=5037)
+devices = client.devices()
+d = devices[0]
+
+print(d.serial)  #시리얼 번호
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect(("pwnbit.kr", 443))
+print("내부 IP: ", sock.getsockname()[0])
+
+req = requests.get("http://ipconfig.kr")
+print("외부 IP: ", re.search(r'IP Address : (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', req.text)[1])
+
+d.shell("input keyevent 64") #크롬 실행
+time.sleep(2.0)
+
+xyposition = '423 136'
+d.shell(f'input tap {xyposition}') #주소창 탭 추가
+time.sleep(2.0)
+
+url = 'www.naver.com'
+d.shell(f'input text {url}')  #네이버 URL 주소 입력
+time.sleep(2.0)
+
+d.shell("input keyevent 66")  #엔터
+time.sleep(2.0) 
+
+#  usb 테더링 제어 
+#os.system("svc data disable")
+#time.sleep(5.0)
+#os.system("svc data enable")
+#time.sleep(5.0)
