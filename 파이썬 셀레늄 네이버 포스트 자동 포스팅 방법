@@ -1,0 +1,329 @@
+# import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import os
+from googleapiclient.discovery import build
+from httplib2 import Http
+from oauth2client import file, client, tools
+from googleapiclient.http import MediaFileUpload
+from __future__ import print_function
+import pickle
+import os.path
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+import  warnings
+from    selenium import webdriver
+from    selenium.webdriver.support import expected_conditions as EC
+from    selenium.webdriver.common.keys import Keys 
+from    selenium.webdriver.common.action_chains import ActionChains
+from    selenium.common.exceptions import NoSuchElementException,StaleElementReferenceException
+from    bs4      import BeautifulSoup
+import  time
+import  pyperclip
+import  requests
+import  datetime
+import  pymssql
+import  pandas as pd
+from  pandas.core.frame import DataFrame
+import  matplotlib.pyplot as plt
+import  chromedriver_autoinstaller
+import  subprocess
+from    selenium import webdriver
+from    selenium.webdriver.chrome.options import Options
+from    selenium.webdriver.common.alert import Alert
+import  chromedriver_autoinstaller
+import  subprocess
+import  shutil 
+import  xlrd
+import  openpyxl 
+import  pygsheets
+import  csv
+import  re
+import  webbrowser
+import  os
+import  sys
+import  urllib.request
+import  json
+from    pandas.io.json import json_normalize
+import  hashlib
+import  hmac
+import  base64
+import  numpy as np
+import  autoit #autoit는 반드시 autoit 프로그램이 깔려있어야됨
+import  pyautogui
+from PIL import ImageGrab
+import glob
+
+warnings.filterwarnings('ignore')
+
+#try:
+#    shutil.rmtree(r"c:\chrometemp")  #쿠키 / 캐쉬파일 삭제
+#except FileNotFoundError:
+#    pass
+
+subprocess.Popen(r'C:\Program Files\Google\Chrome\Application\chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\chrometemp"') # 디버거 크롬 구동
+option = Options()
+option.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+chrome_ver = chromedriver_autoinstaller.get_chrome_version().split('.')[0]
+try:
+    driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe', options=option)
+except:
+    chromedriver_autoinstaller.install(True)
+    driver = webdriver.Chrome(f'./{chrome_ver}/chromedriver.exe', options=option)
+driver.maximize_window() #최대창
+time.sleep(3)    
+driver.implicitly_wait(10)
+
+action = ActionChains(driver) #액션지정
+
+#네이버 이동
+
+url = 'https://www.naver.com'
+driver.get(url)
+time.sleep(5)
+driver.implicitly_wait(10)
+
+driver.find_element_by_class_name('link_login').click()
+time.sleep(1)
+driver.implicitly_wait(10)
+
+#id, pw 입력할 곳 찾기
+
+tag_id = driver.find_element_by_name('id')
+tag_pw = driver.find_element_by_name('pw')
+driver.implicitly_wait(10)
+
+#id 입력
+
+tag_id.click()
+pyperclip.copy('id') 
+tag_id.send_keys(Keys.CONTROL, 'v')
+time.sleep(2)
+driver.implicitly_wait(10)
+
+#pw 입력
+
+tag_pw.click()
+pyperclip.copy('pw')
+tag_pw.send_keys(Keys.CONTROL, 'v')
+time.sleep(2)
+driver.implicitly_wait(10)
+
+#로그인 버튼 클릭
+
+login_btn = driver.find_element_by_id('log.login')
+login_btn.click()
+time.sleep(1)
+driver.implicitly_wait(10)
+
+#등록안함 클릭
+
+try :
+    driver.find_element_by_xpath('//*[@id="new.dontsave"]').click() #등록안함 클릭
+except :
+    pass
+time.sleep(1)
+driver.implicitly_wait(10)
+
+#네이버 포스트 주소로 이동
+
+url = 'https://post.naver.com'
+driver.get(url)
+time.sleep(2)
+driver.implicitly_wait(10)
+
+#포스트 쓰기 버튼 클릭
+
+post_btn = driver.find_element_by_xpath('//*[@id="header"]/div[1]/a[3]')
+post_btn.click()
+time.sleep(3)
+driver.implicitly_wait(10)
+
+#팝업 제거
+
+#position = pyautogui.position() # 좌표 객체 얻기 
+#print(pyautogui.size()) #화면전체크기 확인하기
+
+#while True :  #마우스 위치 알아내기
+#    print( "Current Mouse Position : ", pyautogui.position())
+#    time.sleep(1)
+
+# 좌표 위치 입력 (x, y, 버튼, 횟수, 간격)
+#pyautogui.click(1368, 370, button='left', clicks=1, interval = 1 ) #팝업창 클릭(완료)
+#time.sleep(2)
+#driver.implicitly_wait(10)
+
+
+
+################# 자동 포스팅
+
+health_naver_posting = pd.read_excel('C:/Users/user/Desktop/folder/folder/blog_viewracle.xlsx')
+
+
+for i in range(1, 16) :
+    url = 'https://post.editor.naver.com/editor'
+    driver.get(url) #생략
+    time.sleep(1) #생략
+    driver.implicitly_wait(10)
+    action = ActionChains(driver) #액션지정
+
+    try :  #사이트 떠나기 엔터키 누르기*(사이트 나가기 창이 뜰시 기준)
+        # alert 창의 메시지를 확인하고 싶습니다.
+        alert = driver.switch_to.alert
+        message = alert.text
+        print("Alert shows following message: "+ message )
+        time.sleep(1)
+        # 메시지를 확인했으니 창을 닫습니다.
+        alert = driver.switch_to.alert
+        alert.accept() #에러 받아들이기
+        time.sleep(1)
+        driver.implicitly_wait(10)
+        driver.get(url)
+        time.sleep(1)
+        driver.send_keys(Keys.ENTER)  #사이트 떠나기 엔터키 누르기
+        driver.implicitly_wait(10)
+    except :
+        print("no alert")
+
+    try :
+        # alert 창의 메시지를 확인하고 싶습니다.
+        alert = driver.switch_to.alert
+        message = alert.text
+        print("Alert shows following message: "+ message )
+        time.sleep(2)
+        # 메시지를 확인했으니 창을 닫습니다.
+        alert = driver.switch_to.alert
+        alert.dismiss() #무시하기
+        time.sleep(1)
+        driver.implicitly_wait(10)
+    except :
+        print("no alert")
+
+    time.sleep(1) 
+    driver.implicitly_wait(10)
+    
+    
+    title_directory = health_naver_posting.loc[i]['title_2']  #제목
+    img_file_directory = health_naver_posting.loc[i]['img_directory'] #이미지
+    txt_file_directory = health_naver_posting.loc[i]['txt_directory'] #텍스트
+    img_dir = img_file_directory #이미지
+    
+    f = open(txt_file_directory, 'r', encoding='utf-8')  #메모장 파일열기
+    f_2 = open(txt_file_directory, 'r', encoding='utf-8')  #메모장 파일열기
+
+    content_list = f.readlines() #본문
+    #blogger_title = content_list[0] #제목만
+    blogger_title = title_directory #제목만
+    blogger_title_2 = blogger_title.replace("\ufeff", "") #제목 필터링
+    
+    
+    
+    content_desc = f_2.read() #본문
+    tistory_title = str(blogger_title_2) #제목
+    
+    ############  네이버 포스트 제목 입력
+    
+    
+    
+    iframes = driver.find_elements_by_tag_name('iframe')
+    driver.switch_to.frame(iframes[0])
+    
+    #tag = str(tistory_title)  #태그
+    tag_title = driver.find_element_by_xpath("//textarea[@placeholder='제목']") #Span 클래스 내 "제목" 단어 찾기
+    #tag_title = driver.find_element_by_xpath("//textarea[contains(@placeholder, '제목')]") 
+    #tag_title = driver.find_element_by_xpath('//textarea[contains(text(),"제목")]')
+    #tag_title = driver.find_element_by_xpath("//textarea[@placeholder='제목' and @class='se_editable se_textarea']")
+    
+    tag_title.click()  # "제목" 클릭
+    time.sleep(1) 
+    title = str(tistory_title)
+    time.sleep(1) 
+    action.send_keys(title).perform()  #입력
+    action = ActionChains(driver) #초기화
+    time.sleep(1)
+    driver.implicitly_wait(10)
+    
+    #iframes = driver.find_elements_by_tag_name('iframe')
+    #print('현재 페이지에 iframe은 %d개가 있습니다.' % len(iframes))
+    
+    #for i, iframe in enumerate(iframes):
+    #    try:
+    #        print('%d번째 iframe 입니다.' % i)
+    #        # i 번째 iframe으로 변경합니다.
+    #        driver.switch_to.frame(iframes[i])
+    #        # 변경한 iframe 안의 소스를 확인합니다.
+    #        print(driver.page_source)
+    #        # 원래 frame으로 돌아옵니다.
+    #        driver.switch_to.default_content()
+    #    except:
+    #        # exception이 발생했다면 원래 frame으로 돌아옵니다.
+    #        driver.switch_to.default_content()
+    #        # 몇 번째 frame에서 에러가 났었는지 확인합니다.
+    #        print('pass by except : iframes[%d]' % i)
+    #        # 다음 for문으로 넘어갑니다.
+    
+    #tag_content = driver.find_element_by_xpath("//div[contains(text(),'내용을')]") #내용 태그
+    tag_content = driver.find_element_by_xpath("//div[@class='se_editView']") #내용 태그
+    tag_content.click()
+    time.sleep(1)
+    driver.implicitly_wait(10)
+    
+    
+    
+    #### 소개말 넣기
+    
+    content_1 = "안녕하세요? " +'\n'
+    
+    action = ActionChains(driver) #초기화
+    action.send_keys(content_1).perform() #컨텐츠 입력
+    time.sleep(1)
+    driver.implicitly_wait(10)
+    
+    
+    
+    
+    #### 본문 내용 넣기
+    
+    content_3_detail = str(content_desc) + '\n' + '\n'
+    action = ActionChains(driver) #초기화
+    action.send_keys(content_3_detail).perform() #컨텐츠 입력
+    time.sleep(1)
+    driver.implicitly_wait(10)
+    
+    
+    
+    #### 이미지 넣기
+    driver.switch_to.default_content() # 아이프레임 빠져나오기
+    
+    file_dir = health_naver_posting.loc[i]['directory'] + '/'
+    img_lists = glob.glob(str(file_dir)+'submit_img_*.jpg') #리스트화
+    
+    
+    for n in range(1, len(img_lists)):
+        pic_dir = img_lists[n] #해당 이미지 가져오기 (첫번째꺼는 제외)
+        pic_dir = pic_dir.replace("\\", "/") #디렉토리 수정
+        
+        tag_picture = driver.find_element_by_xpath('//*[@id="se_side_comp_list"]/li[2]')  #이미지 버튼 주소
+        tag_picture.click() #링크 버튼 클릭
+        
+        time.sleep(2)
+        
+        handle = "[CLASS:#32770; TITLE:열기]" #Basic Window info 값 handle 변수에 저장
+        autoit.win_wait_active("열기", 3)  #이름이 '열기'인 창이 나올 때까지 3초간 대기
+
+        #img_path = "C:/Users/user/Desktop/test/image/test_"+str(keyword)+".jpg" #이미지경로
+        img_path = str(pic_dir)   #이미지경로 변경 
+        img_path_2 = img_path.replace('/', '\\') # 백슬래시는 두번 써야됨
+
+        autoit.control_send(handle, "Edit1", img_path_2) #사진 클릭시 나오는 윈도우 창에서 파일이름(N)에 이미지 경로값 전달
+        time.sleep(1)
+        autoit.control_click(handle, "Button1") #사진 클릭시 나오는 윈도우 창에서 Button1 클릭
+        time.sleep(1)
+        
+    
+    #최종 임시저장 클릭
+    
+    driver.find_element_by_xpath('//*[@id="se_top_menu_area"]/div[1]/div[3]/ul/li[1]/div[1]').click() #저장 클릭 
+
+driver.close()
+driver.quit()
